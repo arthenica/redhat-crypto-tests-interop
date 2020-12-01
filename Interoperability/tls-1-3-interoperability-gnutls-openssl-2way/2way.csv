@@ -1,0 +1,40 @@
+# ACTS Test Suite Generation: Thu Jul 11 13:51:10 CEST 2019
+#  '*' represents don't care value 
+# Degree of interaction coverage: 2
+# Number of parameters: 7
+# Maximum number of values per parameter: 5
+# Number of configurations: 33
+cert,c_name,c_sig,g_name,HRR,resume,k_update
+rsa,TLS_AES_128_GCM_SHA256,SHA256,P-256,false,false,false
+rsa,TLS_AES_256_GCM_SHA384,SHA384,P-384,true,true,true
+rsa,TLS_CHACHA20_POLY1305_SHA256,SHA512,P-521,false,true,false
+rsa,TLS_AES_128_CCM_SHA256,default,X25519,true,false,true
+rsa,TLS_AES_128_CCM_8_SHA256,SHA256,default,false,true,true
+rsa-pss,TLS_AES_128_GCM_SHA256,SHA512,P-384,true,false,false
+rsa-pss,TLS_AES_256_GCM_SHA384,default,P-521,false,true,true
+rsa-pss,TLS_CHACHA20_POLY1305_SHA256,SHA384,X25519,false,false,false
+rsa-pss,TLS_AES_128_CCM_SHA256,SHA512,default,false,true,false
+rsa-pss,TLS_AES_128_CCM_8_SHA256,default,P-256,true,false,false
+ecdsa-p256,TLS_AES_128_GCM_SHA256,default,P-521,true,true,true
+ecdsa-p256,TLS_AES_256_GCM_SHA384,default,X25519,false,false,false
+ecdsa-p256,TLS_CHACHA20_POLY1305_SHA256,default,default,false,false,true
+ecdsa-p256,TLS_AES_128_CCM_SHA256,default,P-256,false,true,true
+ecdsa-p256,TLS_AES_128_CCM_8_SHA256,default,P-384,false,false,true
+ecdsa-p384,TLS_AES_128_GCM_SHA256,default,X25519,true,true,false
+ecdsa-p384,TLS_AES_256_GCM_SHA384,default,default,false,false,true
+ecdsa-p384,TLS_CHACHA20_POLY1305_SHA256,default,P-256,true,false,true
+ecdsa-p384,TLS_AES_128_CCM_SHA256,default,P-384,true,true,false
+ecdsa-p384,TLS_AES_128_CCM_8_SHA256,default,P-521,true,false,false
+ecdsa-p521,TLS_AES_128_GCM_SHA256,default,default,false,true,false
+ecdsa-p521,TLS_AES_256_GCM_SHA384,default,P-256,true,false,true
+ecdsa-p521,TLS_CHACHA20_POLY1305_SHA256,default,P-384,true,false,true
+ecdsa-p521,TLS_AES_128_CCM_SHA256,default,P-521,false,false,false
+ecdsa-p521,TLS_AES_128_CCM_8_SHA256,default,X25519,false,false,false
+rsa-pss,TLS_AES_256_GCM_SHA384,SHA256,P-384,true,false,true
+rsa-pss,TLS_CHACHA20_POLY1305_SHA256,SHA256,P-521,false,false,false
+rsa,TLS_AES_128_CCM_SHA256,SHA256,X25519,true,false,false
+rsa-pss,TLS_AES_128_GCM_SHA256,SHA384,default,false,true,true
+rsa-pss,TLS_AES_128_CCM_SHA256,SHA384,P-256,true,false,true
+rsa,TLS_AES_128_CCM_8_SHA256,SHA384,P-521,false,false,false
+rsa,TLS_AES_256_GCM_SHA384,SHA512,P-256,true,true,true
+rsa-pss,TLS_AES_128_CCM_8_SHA256,SHA512,X25519,true,false,true
