@@ -156,7 +156,7 @@ tls13interop_gnutls_openssl_setup() {
 
     rlRun "rlImport openssl/certgen"
 
-    rlRun "rlImport distribution/fips"
+    rlRun "rlImport crypto/fips"
     fipsIsEnabled && FIPS=true || FIPS=false
 
     rlRun 'x509KeyGen ca'

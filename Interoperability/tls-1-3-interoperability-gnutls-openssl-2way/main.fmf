@@ -10,7 +10,7 @@ require:
 - library(crypto/fips)
 - url: https://gitlab.com/redhat-crypto/tests/experimental-interop.git
   name: "/Libraries/tls-1-3-interoperability-gnutls-openssl"
-  nick: openssl
+  nick: io
 recommend:
 - expect
 - gnutls

@@ -39,14 +39,15 @@ rlJournalStart
     rlPhaseStartSetup
         rlAssertRpm --all
 
-        rlRun "rlImport distribution/fips"
+        rlRun "rlImport crypto/fips"
         if ! fipsIsEnabled; then
             TWAY_CSV=${TWAY}way.csv
         else
             TWAY_CSV=${TWAY}way.fips.csv
         fi
 
-        rlRun "rlImport openssl/tls-1-3-interoperability-gnutls-openssl"
+        #rlRun "rlImport openssl/tls-1-3-interoperability-gnutls-openssl"
+        rlRun "rlImport io/tls-1-3-interoperability-gnutls-openssl"
         rlRun "TmpDir=\$(mktemp -d)" 0 "Creating tmp directory"
         TEST_DIR=$(pwd)
         rlRun "pushd $TmpDir"

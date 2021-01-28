@@ -7,7 +7,7 @@ component:
 test: ./runtest.sh
 require:
 - library(openssl/certgen)
-- library(distribution/fips)
+- library(crypto/fips)
 - expect
 - gnutls
 - gnutls-utils
