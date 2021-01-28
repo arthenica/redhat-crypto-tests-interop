@@ -7,8 +7,10 @@ component:
 test: ./runtest.sh
 require:
 - library(openssl/certgen)
-- library(distribution/fips)
-- library(openssl/tls-1-3-interoperability-gnutls-openssl)
+- library(crypto/fips)
+- url: https://gitlab.com/redhat-crypto/tests/experimental-interop.git
+  name: "/Libraries/tls-1-3-interoperability-gnutls-openssl"
+  nick: openssl
 recommend:
 - expect
 - gnutls
@@ -31,3 +33,4 @@ relevancy: |
 extra-summary: /CoreOS/openssl/Interoperability/tls-1-3-interoperability-gnutls-openssl-2way
 extra-task: /CoreOS/openssl/Interoperability/tls-1-3-interoperability-gnutls-openssl-2way
 extra-nitrate: TC#0602837
+framework: beakerlib

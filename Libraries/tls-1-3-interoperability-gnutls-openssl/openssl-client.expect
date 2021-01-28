@@ -1,0 +1,35 @@
+#!/usr/bin/expect
+set timeout 10
+spawn /bin/sh -c "$argv"
+expect {
+    "Verify return code: 0" { }
+    eof { exit 7 }
+    timeout { close; exit 8 }
+}
+expect {
+    "Verify return code: 0" { }
+    eof { exit 7 }
+    timeout { close; exit 8 }
+}
+expect {
+    -timeout 2
+    "Verify return code: 0" { }
+    eof { exit 11 }
+# old GnuTLS servers send just one ticket, so accept such connections too
+    timeout { send_user "3rd Verify timeout" }
+}
+expect {
+    -ex "---" { }
+    eof { exit 11 }
+    timeout { exit 12 }
+}
+send "GET / HTTP/1.0\r\r";
+expect {
+    "</HTML>" {
+            close
+    }
+    eof { exit 9 }
+    timeout { exit 10 }
+}
+set info [wait]
+exit [lindex $info 3]

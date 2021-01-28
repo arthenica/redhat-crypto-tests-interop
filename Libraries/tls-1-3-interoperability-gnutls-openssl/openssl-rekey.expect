@@ -1,0 +1,25 @@
+#!/usr/bin/expect
+set timeout 10
+spawn /bin/sh -c "$argv"
+expect {
+    "read R BLOCK" {
+        send "K\r";
+        expect {
+            "KEYUPDATE" { }
+            eof { exit 11 }
+            timeout { exit 12 }
+        }
+        send "GET / HTTP/1.0\r\r";
+        expect {
+            "</HTML>" {
+                    close
+            }
+            eof { exit 9 }
+            timeout { exit 10 }
+        }
+    }
+    eof { exit 7 }
+    timeout { close; exit 8 }
+}
+set info [wait]
+exit [lindex $info 3]

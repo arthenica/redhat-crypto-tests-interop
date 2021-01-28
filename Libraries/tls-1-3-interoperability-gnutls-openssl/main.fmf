@@ -1,0 +1,31 @@
+summary: Test TLS 1.3 interoperability between GnuTLS and OpenSSL (shared code library)
+description: ''
+contact: Alexander Sosedkin <asosedki@redhat.com>
+component:
+- openssl
+- gnutls
+test: ./runtest.sh
+require:
+- library(openssl/certgen)
+- library(distribution/fips)
+- expect
+- gnutls
+- gnutls-utils
+- openssl
+- tcpdump
+duration: 15m
+enabled: true
+tag:
+- NoRHEL4
+- NoRHEL5
+- NoRHEL6
+- NoRHEL7
+- Tier1
+tier: '1'
+relevancy: |
+    # gnutls and openssl don't support tls1.3 on rhel-7 and earlier
+    distro < rhel-8: False
+    distro = rhel-alt: False
+extra-summary: /CoreOS/openssl/Library/tls-1-3-interoperability-gnutls-openssl
+extra-task: /CoreOS/openssl/Library/tls-1-3-interoperability-gnutls-openssl
+extra-nitrate: TC#0602315
