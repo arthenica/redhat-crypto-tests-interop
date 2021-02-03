@@ -148,15 +148,19 @@ tls13interop_gnutls_openssl_group_info() { local g_name=$1
 
 
 tls13interop_gnutls_openssl_setup() {
+    rlLogInfo "Interop library: starting setup"
     rlAssertRpm expect
     rlAssertRpm gnutls
     rlAssertRpm gnutls-utils
     rlAssertRpm openssl
     rlAssertRpm tcpdump
 
+    rlLogInfo "Interop library: importing openssl/certgen"
     rlRun "rlImport openssl/certgen"
 
+    rlLogInfo "Interop library: importing crypto/fips"
     rlRun "rlImport crypto/fips"
+    rlLogInfo "Interop library: imported"
     fipsIsEnabled && FIPS=true || FIPS=false
 
     rlRun 'x509KeyGen ca'
