@@ -55,7 +55,7 @@ $(METADATA): Makefile
 	@echo "Type:            Library" >> $(METADATA)
 	@echo "TestTime:        15m" >> $(METADATA)
 	@echo "RunFor:          gnutls openssl" >> $(METADATA)
-	@echo "RhtsRequires:    library(openssl/certgen) library(distribution/fips) expect gnutls gnutls-utils openssl tcpdump" >> $(METADATA)
+	@echo "RhtsRequires:    library(openssl/certgen) expect gnutls gnutls-utils openssl tcpdump" >> $(METADATA)
 	@echo "Provides:        library(openssl/tls-1-3-interoperability-gnutls-openssl)" >> $(METADATA)
 	@echo "Priority:        Normal" >> $(METADATA)
 	@echo "License:         GPLv2" >> $(METADATA)
