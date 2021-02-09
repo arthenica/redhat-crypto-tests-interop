@@ -1,0 +1,6 @@
+summary: Upstream interoperability
+discover:
+    how: fmf
+    filter: 'tag: interop'
+execute:
+    how: tmt
