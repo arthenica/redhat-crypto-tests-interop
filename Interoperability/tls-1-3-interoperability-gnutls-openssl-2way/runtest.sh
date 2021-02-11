@@ -37,8 +37,7 @@ TWAY=2
 rlJournalStart
     rlPhaseStartSetup
         rlAssertRpm --all
-rlRun "fips-mode-setup --check" #TODO remove
-        rlRun "rlImport crypto/fips"
+        #rlRun "rlImport crypto/fips"
         #rlRun "rlImport openssl/tls-1-3-interoperability-gnutls-openssl"
         rlRun "rlImport io/tls-1-3-interoperability-gnutls-openssl"
         rlRun "TmpDir=\$(mktemp -d)" 0 "Creating tmp directory"
@@ -47,11 +46,11 @@ rlRun "fips-mode-setup --check" #TODO remove
 
         tls13interop_gnutls_openssl_setup
 
-        if ! fipsIsEnabled; then
+        #if ! fipsIsEnabled; then
             TWAY_CSV=${TWAY}way.csv
-        else
-            TWAY_CSV=${TWAY}way.fips.csv
-        fi
+        #else
+            #TWAY_CSV=${TWAY}way.fips.csv
+        #fi
 
         CONF_COUNTER=0
         CONF_TOTAL=$(grep '^# Number of configurations' $TEST_DIR/$TWAY_CSV | \

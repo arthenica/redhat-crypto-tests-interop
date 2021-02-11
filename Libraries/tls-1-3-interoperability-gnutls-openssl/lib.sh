@@ -158,10 +158,11 @@ tls13interop_gnutls_openssl_setup() {
     rlLogInfo "Interop library: importing openssl/certgen"
     rlRun "rlImport openssl/certgen"
 
-    rlLogInfo "Interop library: importing crypto/fips"
-    rlRun "rlImport crypto/fips"
-    rlLogInfo "Interop library: imported"
-    fipsIsEnabled && FIPS=true || FIPS=false
+    #rlLogInfo "Interop library: importing crypto/fips"
+    #rlRun "rlImport crypto/fips"
+    #rlLogInfo "Interop library: imported"
+    #fipsIsEnabled && FIPS=true || FIPS=false
+    FIPS=false
 
     rlRun 'x509KeyGen ca'
     rlRun 'x509KeyGen rsa-ca'

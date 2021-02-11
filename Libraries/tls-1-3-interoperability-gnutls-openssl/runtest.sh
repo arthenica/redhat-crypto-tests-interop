@@ -34,7 +34,7 @@ PACKAGES="openssl gnutls"
 rlJournalStart
     rlPhaseStartSetup
         rlAssertRpm --all
-        rlRun "rlImport crypto/fips"
+        #rlRun "rlImport crypto/fips"
         rlRun "rlImport openssl/tls-1-3-interoperability-gnutls-openssl"
         rlRun "TmpDir=\$(mktemp -d)" 0 "Creating tmp directory"
         rlRun "pushd $TmpDir"
@@ -60,15 +60,15 @@ rlJournalStart
     tls13interop_gnutls_openssl_test \
         ecdsa-p521 TLS_AES_128_GCM_SHA256       default default  '' '' ''
 
-    if ! fipsIsEnabled; then
+#    if ! fipsIsEnabled; then
         tls13interop_gnutls_openssl_test \
             rsa TLS_CHACHA20_POLY1305_SHA256    SHA512  X25519 \
             ' HRR' ' resume' ' key update'
-    else
-        tls13interop_gnutls_openssl_test \
-            rsa TLS_AES_128_GCM_SHA256          SHA512  P-256 \
-            ' HRR' ' resume' ' key update'
-    fi
+#    else
+#        tls13interop_gnutls_openssl_test \
+#            rsa TLS_AES_128_GCM_SHA256          SHA512  P-256 \
+#            ' HRR' ' resume' ' key update'
+#    fi
 
     rlPhaseStartCleanup
         rlRun "popd"
