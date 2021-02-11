@@ -80,6 +80,7 @@ rlJournalStart
         let CONF_COUNTER+=1
     done < $TEST_DIR/$TWAY_CSV
 
+    CONF_TOTAL=23 # FIXME update csv (enable rsa-pss tests) and remove this line once bz1926366 is fixed
     rlPhaseStartTest "Check that we have tested $CONF_TOTAL configurations"
         rlAssertEquals "We have tested $CONF_COUNTER configurations, \
                         should be $CONF_TOTAL" \
