@@ -37,8 +37,8 @@ TWAY=2
 rlJournalStart
     rlPhaseStartSetup
         rlAssertRpm --all
-
-        #rlRun "rlImport crypto/fips"
+rlRun "fips-mode-setup --check" #TODO remove
+        rlRun "rlImport crypto/fips"
         #rlRun "rlImport openssl/tls-1-3-interoperability-gnutls-openssl"
         rlRun "rlImport io/tls-1-3-interoperability-gnutls-openssl"
         rlRun "TmpDir=\$(mktemp -d)" 0 "Creating tmp directory"
