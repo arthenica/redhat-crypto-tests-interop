@@ -1,12 +1,12 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-#   Makefile of /CoreOS/openssl/Interoperability/tls-1-3-interoperability-gnutls-openssl
-#   Description: Test TLS 1.3 interoperability between GnuTLS and OpenSSL
+#   Makefile of /CoreOS/openssl/Library/certgen
+#   Description: Library for creating X.509 certificates for any use
 #   Author: Hubert Kario <hkario@redhat.com>
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-#   Copyright (c) 2018 Red Hat, Inc.
+#   Copyright (c) 2014 Red Hat, Inc.
 #
 #   This copyrighted material is made available to anyone wishing
 #   to use, modify, copy, or redistribute it subject to the terms
@@ -24,12 +24,12 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-export TEST=/CoreOS/openssl/Library/tls-1-3-interoperability-gnutls-openssl
-export TESTVERSION=1.0
+export TEST=/CoreOS/openssl/Library/certgen
+export TESTVERSION=2.0
 
 BUILT_FILES=
 
-FILES=$(METADATA) lib.sh runtest.sh Makefile PURPOSE gnutls-client.expect gnutls-resume.expect openssl-client.expect openssl-rekey.expect
+FILES=$(METADATA) runtest.sh Makefile lib.sh
 
 .PHONY: all install download clean
 
@@ -43,24 +43,22 @@ clean:
 	rm -f *~ $(BUILT_FILES)
 
 
-include /usr/share/rhts/lib/rhts-make.include
+-include /usr/share/rhts/lib/rhts-make.include
 
-# Requires is broken for libraries: http://wiki.test.redhat.com/BaseOs/BeakerLibraries/DevelDoc
 $(METADATA): Makefile
 	@echo "Owner:           Hubert Kario <hkario@redhat.com>" > $(METADATA)
 	@echo "Name:            $(TEST)" >> $(METADATA)
 	@echo "TestVersion:     $(TESTVERSION)" >> $(METADATA)
 	@echo "Path:            $(TEST_DIR)" >> $(METADATA)
-	@echo "Description:     Test TLS 1.3 interoperability between GnuTLS and OpenSSL (shared code library)" >> $(METADATA)
+	@echo "Description:     Library for creating X.509 certificates for any use" >> $(METADATA)
 	@echo "Type:            Library" >> $(METADATA)
-	@echo "TestTime:        15m" >> $(METADATA)
-	@echo "RunFor:          gnutls openssl" >> $(METADATA)
-	@echo "RhtsRequires:    library(openssl/certgen) expect gnutls gnutls-utils openssl tcpdump" >> $(METADATA)
-	@echo "Provides:        library(openssl/tls-1-3-interoperability-gnutls-openssl)" >> $(METADATA)
+	@echo "TestTime:        45m" >> $(METADATA)
+	@echo "RunFor:          openssl" >> $(METADATA)
+	@echo "Requires:        openssl" >> $(METADATA)
+	@echo "Provides:        library(openssl/certgen)" >> $(METADATA)
 	@echo "Priority:        Normal" >> $(METADATA)
 	@echo "License:         GPLv2" >> $(METADATA)
 	@echo "Confidential:    no" >> $(METADATA)
 	@echo "Destructive:     no" >> $(METADATA)
-	@echo "Releases:        -RHEL4 -RHEL6 -RHEL7 -RHELClient5 -RHELServer5" >> $(METADATA)
 
 	rhts-lint $(METADATA)

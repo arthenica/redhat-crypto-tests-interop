@@ -32,25 +32,28 @@
 PACKAGE="openssl"
 PACKAGES="openssl gnutls"
 
-TWAY=2
+TWAY=2way
 
 rlJournalStart
     rlPhaseStartSetup
         rlAssertRpm --all
-        #rlRun "rlImport crypto/fips"
-        #rlRun "rlImport openssl/tls-1-3-interoperability-gnutls-openssl"
-        rlRun "rlImport io/tls-1-3-interoperability-gnutls-openssl"
+
+        rlRun "rlImport fips"
+        if ( ! rlIsRHEL '<9' ) && ( ! rlIsFedora); then
+            TWAY="${TWAY}-9.0"
+        fi
+        if ! fipsIsEnabled; then
+            TWAY_CSV=${TWAY}.csv
+        else
+            TWAY_CSV=${TWAY}.fips.csv
+        fi
+
+        rlRun "rlImport tls-1-3-interoperability-gnutls-openssl"
         rlRun "TmpDir=\$(mktemp -d)" 0 "Creating tmp directory"
         TEST_DIR=$(pwd)
         rlRun "pushd $TmpDir"
 
         tls13interop_gnutls_openssl_setup
-
-        #if ! fipsIsEnabled; then
-            TWAY_CSV=${TWAY}way.csv
-        #else
-            #TWAY_CSV=${TWAY}way.fips.csv
-        #fi
 
         CONF_COUNTER=0
         CONF_TOTAL=$(grep '^# Number of configurations' $TEST_DIR/$TWAY_CSV | \
@@ -78,7 +81,6 @@ rlJournalStart
         let CONF_COUNTER+=1
     done < $TEST_DIR/$TWAY_CSV
 
-    CONF_TOTAL=23 # FIXME update csv (enable rsa-pss tests) and remove this line once bz1926366 is fixed
     rlPhaseStartTest "Check that we have tested $CONF_TOTAL configurations"
         rlAssertEquals "We have tested $CONF_COUNTER configurations, \
                         should be $CONF_TOTAL" \

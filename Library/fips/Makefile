@@ -1,12 +1,12 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-#   Makefile of /CoreOS/openssl/Interoperability/tls-1-3-interoperability-gnutls-openssl-2way
-#   Description: Test TLS 1.3 interoperability between GnuTLS and OpenSSL
-#   Author: Hubert Kario <hkario@redhat.com>
+#   Makefile of /distribution/Library/fips
+#   Description: A set of helpers for FIPS 140 testing.
+#   Author: Ondrej Moris <omoris@redhat.com>
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-#   Copyright (c) 2018 Red Hat, Inc.
+#   Copyright (c) 2018 Red Hat, Inc. All rights reserved.
 #
 #   This copyrighted material is made available to anyone wishing
 #   to use, modify, copy, or redistribute it subject to the terms
@@ -24,18 +24,12 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-export TEST=/CoreOS/openssl/Interoperability/tls-1-3-interoperability-gnutls-openssl-2way
+export TEST=/distribution/Library/fips
 export TESTVERSION=1.0
 
 BUILT_FILES=
 
-FILES=$(METADATA) runtest.sh Makefile PURPOSE 2way.csv 2way.fips.csv 2way-9.0.csv 2way-9.0.fips.csv
-
-#2way.csv: ../../Library/tls-1-3-interoperability-gnutls-openssl/acts-config.txt
-#	java -Ddoi=2 -Doutput=csv -jar $(ACTS_JAR) $< $@
-#
-#2way.fips.csv: ../../Library/tls-1-3-interoperability-gnutls-openssl/acts-config.fips.txt
-#	java -Ddoi=2 -Doutput=csv -jar $(ACTS_JAR) $< $@
+FILES=$(METADATA) runtest.sh lib.sh Makefile rstrnt-package-workaround.sh
 
 .PHONY: all install download clean
 
@@ -52,19 +46,15 @@ clean:
 include /usr/share/rhts/lib/rhts-make.include
 
 $(METADATA): Makefile
-	@echo "Owner:           Hubert Kario <hkario@redhat.com>" > $(METADATA)
+	@echo "Owner:           Ondrej Moris <omoris@redhat.com>" > $(METADATA)
 	@echo "Name:            $(TEST)" >> $(METADATA)
 	@echo "TestVersion:     $(TESTVERSION)" >> $(METADATA)
 	@echo "Path:            $(TEST_DIR)" >> $(METADATA)
-	@echo "Description:     Test TLS 1.3 interoperability between GnuTLS and OpenSSL" >> $(METADATA)
-	@echo "Type:            Interoperability" >> $(METADATA)
-	@echo "TestTime:        40m" >> $(METADATA)
-	@echo "RunFor:          gnutls openssl" >> $(METADATA)
-	@echo "Requires:        expect gnutls gnutls-utils openssl tcpdump" >> $(METADATA)
-	@echo "Priority:        Normal" >> $(METADATA)
+	@echo "Description:     A set of helpers for FIPS 140 testing" >> $(METADATA)
+	@echo "Type:            Library" >> $(METADATA)
+	@echo "Requires:        coreutils crypto-policies crypto-policies-scripts fips-mode-setup" >> $(METADATA)
+	@echo "TestTime:        30m" >> $(METADATA)
+	@echo "Provides:        library(distribution/fips)" >> $(METADATA)
 	@echo "License:         GPLv2" >> $(METADATA)
-	@echo "Confidential:    no" >> $(METADATA)
-	@echo "Destructive:     no" >> $(METADATA)
-	@echo "Releases:        -RHEL4 -RHEL6 -RHEL7 -RHELClient5 -RHELServer5" >> $(METADATA)
 
 	rhts-lint $(METADATA)

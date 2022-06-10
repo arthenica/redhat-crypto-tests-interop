@@ -69,15 +69,19 @@ tls13interop_gnutls_openssl_GROUP_NAMES+=('P-256')
 tls13interop_gnutls_openssl_GROUP_NAMES+=('P-384')
 tls13interop_gnutls_openssl_GROUP_NAMES+=('P-521')
 tls13interop_gnutls_openssl_GROUP_NAMES+=('X25519')
-# X448 is not supported by GnuTLS
-#tls13interop_gnutls_openssl_GROUP_NAMES+=('X448')
-# FFDHE is not supported by OpenSSL 1.1.1 RHBZ#1593671
-# https://github.com/openssl/openssl/issues/6519
-#tls13interop_gnutls_openssl_GROUP_NAMES+=('FFDHE2048')
-#tls13interop_gnutls_openssl_GROUP_NAMES+=('FFDHE3072')
-#tls13interop_gnutls_openssl_GROUP_NAMES+=('FFDHE4096')
-# # FFDHE 6144 is not supported by GnuTLS
-#tls13interop_gnutls_openssl_GROUP_NAMES+=('FFDHE8192')
+if ! rlIsRHEL '<9'; then
+    # X448 is not supported by GnuTLS in RHEL-8, added in RHEL-9
+    tls13interop_gnutls_openssl_GROUP_NAMES+=('X448')
+    # FFDHE is not supported by OpenSSL 1.1.1 RHBZ#1593671
+    # https://github.com/openssl/openssl/issues/6519
+    # added in RHEL-9 in OpenSSL
+    tls13interop_gnutls_openssl_GROUP_NAMES+=('FFDHE2048')
+    tls13interop_gnutls_openssl_GROUP_NAMES+=('FFDHE3072')
+    tls13interop_gnutls_openssl_GROUP_NAMES+=('FFDHE4096')
+    # # FFDHE 6144 is not supported by GnuTLS in RHEL-8
+    tls13interop_gnutls_openssl_GROUP_NAMES+=('FFDHE6144')
+    tls13interop_gnutls_openssl_GROUP_NAMES+=('FFDHE8192')
+fi
 
 tls13interop_gnutls_openssl_group_info() { local g_name=$1
     case $g_name in
@@ -111,58 +115,67 @@ tls13interop_gnutls_openssl_group_info() { local g_name=$1
         G_GNUTLS_HRR=':-GROUP-ALL:+GROUP-SECP256R1:+GROUP-X25519'
         G_OPENSSL_HRR='P-256:X25519'
     ;;
-    #X448)
-    #   G_GNUTLS=':-GROUP-ALL:+GROUP-X448'
-    #   G_OPENSSL='X448'
-    #   G_GNUTLS_HRR=':-GROUP-ALL:+GROUP-SECP256R1:+GROUP-X448'
-    #   G_OPENSSL_HRR='P-256:X448'
-    #;;
-    #FFDHE2048)
-    #    G_GNUTLS=':-GROUP-ALL:+GROUP-FFDHE2048'
-    #    G_OPENSSL='FF2048'
-    #    G_GNUTLS_HRR=':-GROUP-ALL:+GROUP-FFDHE3072:+GROUP-FFDHE2048'
-    #    G_OPENSSL_HRR='P256,FF2048'
-    #;;
-    #FFDHE3072)
-    #    G_GNUTLS=':-GROUP-ALL:+GROUP-FFDHE3072'
-    #    G_OPENSSL='FF3072'
-    #    G_GNUTLS_HRR=':-GROUP-ALL:+GROUP-FFDHE2048:+GROUP-FFDHE3072'
-    #    G_OPENSSL_HRR='P256,FF3072'
-    #;;
-    #FFDHE 4096)
-    #    G_GNUTLS=':-GROUP-ALL:+GROUP-FFDHE4096'
-    #    G_OPENSSL='FF4096'
-    #    G_GNUTLS_HRR=':-GROUP-ALL:+GROUP-FFDHE8192:+GROUP-FFDHE4096'
-    #    G_OPENSSL_HRR='FF2048,FF4096'
-    #;;
-    #FFDHE 8192)
-    #    G_GNUTLS=':-GROUP-ALL:+GROUP-FFDHE8192'
-    #    G_OPENSSL='FF8192'
-    #    G_GNUTLS_HRR=':-GROUP-ALL:+GROUP-FFDHE2048:+GROUP-FFDHE8192'
-    #    G_OPENSSL_HRR='P256,FF8192'
-    #;;
+    X448)
+       G_GNUTLS=':-GROUP-ALL:+GROUP-X448'
+       G_OPENSSL='X448'
+       G_GNUTLS_HRR=':-GROUP-ALL:+GROUP-SECP256R1:+GROUP-X448'
+       G_OPENSSL_HRR='P-256:X448'
+    ;;
+    FFDHE2048)
+        G_GNUTLS=':-GROUP-ALL:+GROUP-FFDHE2048'
+        G_OPENSSL='ffdhe2048'
+        G_GNUTLS_HRR=':-GROUP-ALL:+GROUP-FFDHE3072:+GROUP-FFDHE2048'
+        G_OPENSSL_HRR='ffdhe4096:ffdhe2048'
+    ;;
+    FFDHE3072)
+        G_GNUTLS=':-GROUP-ALL:+GROUP-FFDHE3072'
+        G_OPENSSL='ffdhe3072'
+        G_GNUTLS_HRR=':-GROUP-ALL:+GROUP-FFDHE2048:+GROUP-FFDHE3072'
+        G_OPENSSL_HRR='ffdhe4096:ffdhe3072'
+    ;;
+    FFDHE4096)
+        G_GNUTLS=':-GROUP-ALL:+GROUP-FFDHE4096'
+        G_OPENSSL='ffdhe4096'
+        G_GNUTLS_HRR=':-GROUP-ALL:+GROUP-FFDHE8192:+GROUP-FFDHE4096'
+        G_OPENSSL_HRR='ffdhe2048:ffdhe4096'
+    ;;
+    FFDHE6144)
+        G_GNUTLS=':-GROUP-ALL:+GROUP-FFDHE6144'
+        G_OPENSSL='ffdhe6144'
+        G_GNUTLS_HRR=':-GROUP-ALL:+GROUP-FFDHE4096:+GROUP-FFDHE6144'
+        G_OPENSSL_HRR='ffdhe8192:ffdhe6144'
+    ;;
+    FFDHE8192)
+        G_GNUTLS=':-GROUP-ALL:+GROUP-FFDHE8192'
+        G_OPENSSL='ffdhe8192'
+        G_GNUTLS_HRR=':-GROUP-ALL:+GROUP-FFDHE2048:+GROUP-FFDHE8192'
+        G_OPENSSL_HRR='ffdhe3072:ffdhe8192'
+    ;;
     *) rlDie "Unknown group name $g_name";;
     esac
     echo $G_GNUTLS $G_OPENSSL $G_GNUTLS_HRR $G_OPENSSL_HRR
 }
 
 
+tls13interop_clean_log() {
+    # "GET / HTTP/1.0" and "HTTP/1.0 200 OK" are infrequently interrupted
+    # by the likes of "read R BLOCK".
+    # Clean the latter ones out.
+    sed -z 's|read R BLOCK\n||' $1 > $2
+}
+
+
 tls13interop_gnutls_openssl_setup() {
-    rlLogInfo "Interop library: starting setup"
     rlAssertRpm expect
     rlAssertRpm gnutls
     rlAssertRpm gnutls-utils
     rlAssertRpm openssl
     rlAssertRpm tcpdump
 
-    rlLogInfo "Interop library: importing openssl/certgen"
-    rlRun "rlImport openssl/certgen"
+    rlRun "rlImport certgen"
 
-    #rlLogInfo "Interop library: importing crypto/fips"
-    #rlRun "rlImport crypto/fips"
-    #rlLogInfo "Interop library: imported"
-    #fipsIsEnabled && FIPS=true || FIPS=false
-    FIPS=false
+    rlRun "rlImport fips"
+    fipsIsEnabled && FIPS=true || FIPS=false
 
     rlRun 'x509KeyGen ca'
     rlRun 'x509KeyGen rsa-ca'
@@ -170,54 +183,90 @@ tls13interop_gnutls_openssl_setup() {
     rlRun 'x509KeyGen -t ecdsa -s prime256v1 ecdsa-p256-ca'
     rlRun 'x509KeyGen -t ecdsa -s secp384r1 ecdsa-p384-ca'
     rlRun 'x509KeyGen -t ecdsa -s secp521r1 ecdsa-p521-ca'
+    if ! $FIPS; then
+        rlRun 'x509KeyGen -t Ed25519 ed25519-ca'
+        rlRun 'x509KeyGen -t Ed448 ed448-ca'
+    fi
     rlRun 'x509KeyGen rsa-server'
     rlRun 'x509KeyGen -t rsa-pss rsa-pss-server'
     rlRun 'x509KeyGen -t ecdsa -s prime256v1 ecdsa-p256-server'
     rlRun 'x509KeyGen -t ecdsa -s secp384r1 ecdsa-p384-server'
     rlRun 'x509KeyGen -t ecdsa -s secp521r1 ecdsa-p521-server'
+    if ! $FIPS; then
+        rlRun 'x509KeyGen -t Ed25519 ed25519-server'
+        rlRun 'x509KeyGen -t Ed448 ed448-server'
+    fi
     rlRun 'x509KeyGen rsa-client'
     rlRun 'x509KeyGen -t rsa-pss rsa-pss-client'
     rlRun 'x509KeyGen -t ecdsa -s prime256v1 ecdsa-p256-client'
     rlRun 'x509KeyGen -t ecdsa -s secp384r1 ecdsa-p384-client'
     rlRun 'x509KeyGen -t ecdsa -s secp521r1 ecdsa-p521-client'
+    rlRun 'x509KeyGen -t ed25519 ed25519-client'
+    rlRun 'x509KeyGen -t ed448 ed448-client'
     rlRun 'x509SelfSign ca'
     rlRun 'x509CertSign --CA ca -t ca --DN "CN=RSA CA" rsa-ca'
     rlRun 'x509CertSign --CA ca -t ca --DN "CN=RSA-PSS CA" rsa-pss-ca'
     rlRun 'x509CertSign --CA ca -t ca --DN "CN=P-256 ECDSA CA" ecdsa-p256-ca'
     rlRun 'x509CertSign --CA ca -t ca --DN "CN=P-384 ECDSA CA" ecdsa-p384-ca'
     rlRun 'x509CertSign --CA ca -t ca --DN "CN=P-521 ECDSA CA" ecdsa-p521-ca'
+    if ! $FIPS; then
+        rlRun 'x509CertSign --CA ca -t ca --DN "CN=Ed25519 EdDSA CA" ed25519-ca'
+        rlRun 'x509CertSign --CA ca -t ca --DN "CN=Ed448 EdDSA CA" ed448-ca'
+    fi
     rlRun 'x509CertSign --CA rsa-ca rsa-server'
     rlRun 'x509CertSign --CA rsa-pss-ca rsa-pss-server'
     rlRun 'x509CertSign --CA ecdsa-p256-ca ecdsa-p256-server'
     rlRun 'x509CertSign --CA ecdsa-p384-ca ecdsa-p384-server'
     rlRun 'x509CertSign --CA ecdsa-p521-ca ecdsa-p521-server'
+    if ! $FIPS; then
+        rlRun 'x509CertSign --CA ed25519-ca ed25519-server'
+        rlRun 'x509CertSign --CA ed448-ca ed448-server'
+    fi
     rlRun 'x509CertSign --CA rsa-ca -t webclient rsa-client'
     rlRun 'x509CertSign --CA rsa-pss-ca -t webclient rsa-pss-client'
     rlRun 'x509CertSign --CA ecdsa-p256-ca -t webclient ecdsa-p256-client'
     rlRun 'x509CertSign --CA ecdsa-p384-ca -t webclient ecdsa-p384-client'
     rlRun 'x509CertSign --CA ecdsa-p521-ca -t webclient ecdsa-p521-client'
+    if ! $FIPS; then
+        rlRun 'x509CertSign --CA ed25519-ca -t webclient ed25519-client'
+        rlRun 'x509CertSign --CA ed448-ca -t webclient ed448-client'
+    fi
     rlRun 'x509DumpCert ca' 0 'Root CA'
     rlRun 'x509DumpCert rsa-ca' 0 'Intermediate RSA CA'
     rlRun 'x509DumpCert rsa-pss-ca' 0 'Intermediate RSA-PSS CA'
     rlRun 'x509DumpCert ecdsa-p256-ca' 0 'Intermediate ECDSA CA'
     rlRun 'x509DumpCert ecdsa-p384-ca' 0 'Intermediate ECDSA CA'
     rlRun 'x509DumpCert ecdsa-p521-ca' 0 'Intermediate ECDSA CA'
+    if ! $FIPS; then
+        rlRun 'x509DumpCert ed25519-ca' 0 'Intermediate EdDSA CA'
+        rlRun 'x509DumpCert ed448-ca' 0 'Intermediate EdDSA CA'
+    fi
     rlRun 'x509DumpCert rsa-server' 0 'Server RSA certificate'
     rlRun 'x509DumpCert rsa-pss-server' 0 'Server RSA-PSS certificate'
     rlRun 'x509DumpCert ecdsa-p256-server' 0 'Server ECDSA certificate'
     rlRun 'x509DumpCert ecdsa-p384-server' 0 'Server ECDSA certificate'
     rlRun 'x509DumpCert ecdsa-p521-server' 0 'Server ECDSA certificate'
+    if ! $FIPS; then
+        rlRun 'x509DumpCert ed25519-server' 0 'Server EdDSA certificate'
+        rlRun 'x509DumpCert ed448-server' 0 'Server EdDSA certificate'
+    fi
     rlRun 'x509DumpCert rsa-client' 0 'Client RSA certificate'
     rlRun 'x509DumpCert rsa-pss-client' 0 'Client RSA-PSS certificate'
     rlRun 'x509DumpCert ecdsa-p256-client' 0 'Client ECDSA certificate'
     rlRun 'x509DumpCert ecdsa-p384-client' 0 'Client ECDSA certificate'
     rlRun 'x509DumpCert ecdsa-p521-client' 0 'Client ECDSA certificate'
+    if ! $FIPS; then
+        rlRun 'x509DumpCert ed25519-client' 0 'Client EdDSA certificate'
+        rlRun 'x509DumpCert ed448-client' 0 'Client EdDSA certificate'
+    fi
 }
 
 
 tls13interop_gnutls_openssl_test() {
     local cert=$1 c_name=$2 c_sig=$3
     local g_name=$4 g_type=$5 sess_type=$6 k_update=$7
+    rlGetPhaseState
+    local START_ECODE=$ECODE
 
     if [[ $g_type == ' HRR' && $g_name == 'default' ]]; then
         rlDie "Do not use HRR with default key exchange as by default all groups are enabled"
@@ -231,8 +280,12 @@ tls13interop_gnutls_openssl_test() {
         rlDie "CHACHA20_POLY1305 is not allowed in FIPS mode"
     fi
 
-    if $FIPS && [[ $g_name = X25519 ]]; then
-        rlDie "X25519 is not allowed in FIPS mode"
+    if $FIPS && [[ $cert =~ ^ed ]]; then
+        rlDie "$cert is not allowed in FIPS mode"
+    fi
+
+    if $FIPS && ( [[ $g_name = X25519 ]] || [[ $g_name = X448 ]] ); then
+        rlDie "X25519 and X448 are not allowed in FIPS mode"
     fi
 
     local EXPECTS=$tls13interop_gnutls_openssl_EXPECTS
@@ -259,7 +312,13 @@ tls13interop_gnutls_openssl_test() {
         OPENSSL_SIG=""
     fi
 
-    rlPhaseStartTest "GnuTLS server OpenSSL client $c_name cipher $cert cert $c_sig sig_alg $g_name kex$g_type$sess_type$k_update"
+    if [[ $tls13interop_no_phases ]]; then
+        rlLogInfo "::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::"
+        rlLogInfo "::  GnuTLS server OpenSSL client $c_name cipher $cert cert $c_sig sig_alg $g_name kex$g_type$sess_type$k_update"
+        rlLogInfo "::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::"
+    else
+        rlPhaseStartTest "GnuTLS server OpenSSL client $c_name cipher $cert cert $c_sig sig_alg $g_name kex$g_type$sess_type$k_update"
+    fi
         [[ $DEBUG ]] && rlRun "tcpdump -i lo -B 1024 -s 0 -U -w capture.pcap port 4433 &"
         [[ $DEBUG ]] && tcpdump_pid=$!
         [[ $DEBUG ]] && sleep 1.5 &
@@ -273,8 +332,8 @@ tls13interop_gnutls_openssl_test() {
         options+=('>server.log' '2>server.err')
         rlRun "${options[*]} &"
         gnutls_pid=$!
-        rlRun "rlWaitForSocket 4433 -d 0.2 -p $gnutls_pid"
-        [[ $DEBUG ]] && rlRun "rlWaitForFile -p $tcpdump_pid capture.pcap"
+        rlRun "rlWaitForSocket 4433 -d 0.1 -p $gnutls_pid"
+        [[ $DEBUG ]] && rlRun "rlWaitForFile -d 0.1 -p $tcpdump_pid capture.pcap"
         options=(openssl s_client)
         if [[ $sess_type == ' resume' ]]; then
             options+=(-sess_out sess.pem)
@@ -300,10 +359,12 @@ tls13interop_gnutls_openssl_test() {
                    > client.log 2> client.err"
         fi
 
-        rlAssertGrep "GET / HTTP/1.0" client.log
-        rlAssertGrep "HTTP/1.0 200 OK" client.log
-        rlAssertGrep "Cipher is $C_OPENSSL" client.log
-        if ! rlGetPhaseState; then
+        tls13interop_clean_log client.log client.log.cleaner
+        rlAssertGrep "GET / HTTP/1.0" client.log.cleaner
+        rlAssertGrep "HTTP/1.0 200 OK" client.log.cleaner
+        rlAssertGrep "Cipher is $C_OPENSSL" client.log.cleaner
+        rlGetPhaseState
+        if [[ $ECODE -gt $START_ECODE ]]; then
             rlRun "cat client.log" 0 "Client output"
             rlRun "cat client.err" 0 "Client error output"
             [[ $DEBUG ]] && bash
@@ -329,10 +390,12 @@ tls13interop_gnutls_openssl_test() {
             rlRun "expect $EXPECTS/openssl-client.expect ${options[*]} \
                    &> client.log"
 
-            rlAssertGrep "GET / HTTP/1.0" client.log
-            rlAssertGrep "HTTP/1.0 200 OK" client.log
-            rlAssertGrep "Reused, TLSv1.3" client.log
-            if ! rlGetPhaseState; then
+            tls13interop_clean_log client.log client.log.cleaner
+            rlAssertGrep "GET / HTTP/1.0" client.log.cleaner
+            rlAssertGrep "HTTP/1.0 200 OK" client.log.cleaner
+            rlAssertGrep "Reused, TLSv1.3" client.log.cleaner
+            rlGetPhaseState
+            if [[ $ECODE -gt $START_ECODE ]]; then
                 rlRun "cat client.log" 0 "Client output"
                 [[ $DEBUG ]] && bash
             fi
@@ -356,10 +419,12 @@ tls13interop_gnutls_openssl_test() {
             rlRun "expect $EXPECTS/openssl-client.expect ${options[*]} \
                    &> client.log"
 
-            rlAssertGrep "GET / HTTP/1.0" client.log
-            rlAssertGrep "HTTP/1.0 200 OK" client.log
-            rlAssertGrep "Reused, TLSv1.3" client.log
-            if ! rlGetPhaseState; then
+            tls13interop_clean_log client.log client.log.cleaner
+            rlAssertGrep "GET / HTTP/1.0" client.log.cleaner
+            rlAssertGrep "HTTP/1.0 200 OK" client.log.cleaner
+            rlAssertGrep "Reused, TLSv1.3" client.log.cleaner
+            rlGetPhaseState
+            if [[ $ECODE -gt $START_ECODE ]]; then
                 rlRun "cat client.log" 0 "Client output"
                 [[ $DEBUG ]] && bash
             fi
@@ -370,15 +435,24 @@ tls13interop_gnutls_openssl_test() {
         [[ $DEBUG ]] && rlRun "rlWait -s 9 $sleep_pid"
         [[ $DEBUG ]] && rlRun "kill $tcpdump_pid"
         [[ $DEBUG ]] && rlRun "rlWait -s 9 $tcpdump_pid"
-        if ! rlGetPhaseState; then
+        rlGetPhaseState
+        if [[ $ECODE -gt $START_ECODE ]]; then
             rlRun "cat server.log" 0 "Server stdout"
             rlRun "cat server.err" 0 "Server stderr"
             rlRun "cat client.log" 0 "Client output"
             [[ $DEBUG ]] && bash
         fi
-    rlPhaseEnd
+    if [[ $tls13interop_no_phases ]]; then
+        rlLogInfo "::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::"
+        rlLogInfo ""
+        rlLogInfo "::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::"
+        rlLogInfo "::  OpenSSL server GnuTLS client $c_name cipher $cert cert $c_sig sig_alg $g_name kex$g_type$sess_type$k_update"
+        rlLogInfo "::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::"
+    else
+        rlPhaseEnd
 
-    rlPhaseStartTest "OpenSSL server GnuTLS client $c_name cipher $cert cert $c_sig sig_alg $g_name kex$g_type$sess_type$k_update"
+        rlPhaseStartTest "OpenSSL server GnuTLS client $c_name cipher $cert cert $c_sig sig_alg $g_name kex$g_type$sess_type$k_update"
+    fi
         [[ $DEBUG ]] && rlRun "tcpdump -i lo -B 1024 -s 0 -U -w capture.pcap port 4433 &"
         [[ $DEBUG ]] && tcpdump_pid=$!
         [[ $DEBUG ]] && sleep 1.5 &
@@ -401,8 +475,8 @@ tls13interop_gnutls_openssl_test() {
 
         rlRun "${options[*]} >server.log 2>server.err &"
         openssl_pid=$!
-        rlRun "rlWaitForSocket -d 0.2 4433 -p $openssl_pid"
-        [[ $DEBUG ]] && rlRun "rlWaitForFile capture.pcap -d 0.2 -p $tcpdump_pid"
+        rlRun "rlWaitForSocket -d 0.1 4433 -p $openssl_pid"
+        [[ $DEBUG ]] && rlRun "rlWaitForFile capture.pcap -d 0.1 -p $tcpdump_pid"
         options=(gnutls-cli)
         options+=(--x509cafile $(x509Cert ca))
         options+=(-p 4433 localhost)
@@ -434,27 +508,37 @@ tls13interop_gnutls_openssl_test() {
                   0,1
         fi
 
-        rlAssertGrep "GET / HTTP/1.0" client.log
-        rlAssertGrep "HTTP/1.0 200 ok" client.log
-        rlAssertGrep $C_OPENSSL client.log
+        tls13interop_clean_log client.log client.log.cleaner
+        rlAssertGrep "GET / HTTP/1.0" client.log.cleaner
+        rlAssertGrep "HTTP/1.0 200 ok" client.log.cleaner
+        rlAssertGrep $C_OPENSSL client.log.cleaner
         if [[ $sess_type == ' resume' ]]; then
-            rlAssertGrep "Resume Handshake was completed" client.log
-            rlAssertGrep "This is a resumed session" client.log
+            rlAssertGrep "Resume Handshake was completed" client.log.cleaner
+            rlAssertGrep "This is a resumed session" client.log.cleaner
         fi
         rlRun "kill $openssl_pid"
         rlRun "rlWait -s 9 $openssl_pid" 143
         [[ $DEBUG ]] && rlRun "rlWait -s 9 $sleep_pid"
         [[ $DEBUG ]] && rlRun "kill $tcpdump_pid"
         [[ $DEBUG ]] && rlRun "rlWait -s 9 $tcpdump_pid"
-        if ! rlGetPhaseState; then
+        rlGetPhaseState
+        if [[ $ECODE -gt $START_ECODE ]]; then
             rlRun "cat server.log" 0 "Server stdout"
             rlRun "cat server.err" 0 "Server stderr"
             rlRun "cat client.log" 0 "Client output"
             [[ $DEBUG ]] && bash
         fi
-    rlPhaseEnd
+    if [[ $tls13interop_no_phases ]]; then
+        rlLogInfo "::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::"
+        rlLogInfo ""
+        rlLogInfo "::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::"
+        rlLogInfo "::  GnuTLS server OpenSSL client $c_name cipher $cert client cert $c_sig sig_alg $g_name kex$g_type$sess_type$k_update"
+        rlLogInfo "::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::"
+    else
+        rlPhaseEnd
 
-    rlPhaseStartTest "GnuTLS server OpenSSL client $c_name cipher $cert client cert $c_sig sig_alg $g_name kex$g_type$sess_type$k_update"
+        rlPhaseStartTest "GnuTLS server OpenSSL client $c_name cipher $cert client cert $c_sig sig_alg $g_name kex$g_type$sess_type$k_update"
+    fi
         [[ $DEBUG ]] && rlRun "tcpdump -i lo -B 1024 -s 0 -U -w capture.pcap port 4433 &"
         [[ $DEBUG ]] && tcpdump_pid=$!
         [[ $DEBUG ]] && sleep 1.5 &
@@ -467,8 +551,8 @@ tls13interop_gnutls_openssl_test() {
         options+=(--require-client-cert --verify-client-cert)
         rlRun "gnutls-serv ${options[*]} >server.log 2>server.err &"
         gnutls_pid=$!
-        rlRun "rlWaitForSocket -d 0.2 4433 -p $gnutls_pid"
-        [[ $DEBUG ]] && rlRun "rlWaitForFile -d 0.2 -p $tcpdump_pid capture.pcap"
+        rlRun "rlWaitForSocket -d 0.1 4433 -p $gnutls_pid"
+        [[ $DEBUG ]] && rlRun "rlWaitForFile -d 0.1 -p $tcpdump_pid capture.pcap"
 
         options=(openssl s_client)
         if [[ $sess_type == ' resume' ]]; then
@@ -497,10 +581,12 @@ tls13interop_gnutls_openssl_test() {
                    &> client.log"
         fi
 
-        rlAssertGrep "GET / HTTP/1.0" client.log
-        rlAssertGrep "HTTP/1.0 200 OK" client.log
-        rlAssertGrep "Cipher is $C_OPENSSL" client.log
-        if ! rlGetPhaseState; then
+        tls13interop_clean_log client.log client.log.cleaner
+        rlAssertGrep "GET / HTTP/1.0" client.log.cleaner
+        rlAssertGrep "HTTP/1.0 200 OK" client.log.cleaner
+        rlAssertGrep "Cipher is $C_OPENSSL" client.log.cleaner
+        rlGetPhaseState
+        if [[ $ECODE -gt $START_ECODE ]]; then
             rlRun "cat client.log" 0 "Client output"
             [[ $DEBUG ]] && bash
         fi
@@ -527,10 +613,12 @@ tls13interop_gnutls_openssl_test() {
             rlRun "expect $EXPECTS/openssl-client.expect ${options[*]} \
                    &> client.log"
 
-            rlAssertGrep "GET / HTTP/1.0" client.log
-            rlAssertGrep "HTTP/1.0 200 OK" client.log
-            rlAssertGrep "Reused, TLSv1.3" client.log
-            if ! rlGetPhaseState; then
+            tls13interop_clean_log client.log client.log.cleaner
+            rlAssertGrep "GET / HTTP/1.0" client.log.cleaner
+            rlAssertGrep "HTTP/1.0 200 OK" client.log.cleaner
+            rlAssertGrep "Reused, TLSv1.3" client.log.cleaner
+            rlGetPhaseState
+            if [[ $ECODE -gt $START_ECODE ]]; then
                 rlRun "cat client.log" 0 "Client output"
                 [[ $DEBUG ]] && bash
             fi
@@ -556,10 +644,12 @@ tls13interop_gnutls_openssl_test() {
             rlRun "expect $EXPECTS/openssl-client.expect ${options[*]} \
                    &> client.log"
 
-            rlAssertGrep "GET / HTTP/1.0" client.log
-            rlAssertGrep "HTTP/1.0 200 OK" client.log
-            rlAssertGrep "Reused, TLSv1.3" client.log
-            if ! rlGetPhaseState; then
+            tls13interop_clean_log client.log client.log.cleaner
+            rlAssertGrep "GET / HTTP/1.0" client.log.cleaner
+            rlAssertGrep "HTTP/1.0 200 OK" client.log.cleaner
+            rlAssertGrep "Reused, TLSv1.3" client.log.cleaner
+            rlGetPhaseState
+            if [[ $ECODE -gt $START_ECODE ]]; then
                 rlRun "cat client.log" 0 "Client output"
                 [[ $DEBUG ]] && bash
             fi
@@ -570,15 +660,24 @@ tls13interop_gnutls_openssl_test() {
         [[ $DEBUG ]] && rlRun "rlWait -s 9 $sleep_pid"
         [[ $DEBUG ]] && rlRun "kill $tcpdump_pid"
         [[ $DEBUG ]] && rlRun "rlWait -s 9 $tcpdump_pid"
-        if ! rlGetPhaseState; then
+        rlGetPhaseState
+        if [[ $ECODE -gt $START_ECODE ]]; then
             rlRun "cat server.log" 0 "Server stdout"
             rlRun "cat server.err" 0 "Server stderr"
             rlRun "cat client.log" 0 "Client output"
             [[ $DEBUG ]] && bash
         fi
-    rlPhaseEnd
+    if [[ $tls13interop_no_phases ]]; then
+        rlLogInfo "::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::"
+        rlLogInfo ""
+        rlLogInfo "::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::"
+        rlLogInfo "::  OpenSSL server GnuTLS client $c_name cipher $cert client cert $c_sig sig_alg $g_name kex$g_type$sess_type$k_update"
+        rlLogInfo "::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::"
+    else
+        rlPhaseEnd
 
-    rlPhaseStartTest "OpenSSL server GnuTLS client $c_name cipher $cert client cert $c_sig sig_alg $g_name kex$g_type$sess_type$k_update"
+        rlPhaseStartTest "OpenSSL server GnuTLS client $c_name cipher $cert client cert $c_sig sig_alg $g_name kex$g_type$sess_type$k_update"
+    fi
         [[ $DEBUG ]] && rlRun "tcpdump -i lo -B 1024 -s 0 -U -w capture.pcap port 4433 &"
         [[ $DEBUG ]] && tcpdump_pid=$!
         [[ $DEBUG ]] && sleep 1.5 &
@@ -596,8 +695,8 @@ tls13interop_gnutls_openssl_test() {
         options+=(-Verify 3)
         rlRun "${options[*]} >server.log 2>server.err &"
         openssl_pid=$!
-        rlRun "rlWaitForSocket -d 0.2 4433 -p $openssl_pid"
-        [[ $DEBUG ]] && rlRun "rlWaitForFile -d 0.2 -p $tcpdump_pid capture.pcap"
+        rlRun "rlWaitForSocket -d 0.1 4433 -p $openssl_pid"
+        [[ $DEBUG ]] && rlRun "rlWaitForFile -d 0.1 -p $tcpdump_pid capture.pcap"
         options=(gnutls-cli)
         options+=(--x509cafile '<(cat $(x509Cert ca) $(x509Cert ${cert}-ca))')
         options+=(-p 4433 localhost)
@@ -631,25 +730,32 @@ tls13interop_gnutls_openssl_test() {
                   0,1
         fi
 
-        rlAssertGrep "GET / HTTP/1.0" client.log
-        rlAssertGrep "HTTP/1.0 200 ok" client.log
-        rlAssertGrep "$C_OPENSSL" client.log
+        tls13interop_clean_log client.log client.log.cleaner
+        rlAssertGrep "GET / HTTP/1.0" client.log.cleaner
+        rlAssertGrep "HTTP/1.0 200 ok" client.log.cleaner
+        rlAssertGrep "$C_OPENSSL" client.log.cleaner
         if [[ $sess_type == ' resume' ]]; then
-            rlAssertGrep "Resume Handshake was completed" client.log
-            rlAssertGrep "This is a resumed session" client.log
+            rlAssertGrep "Resume Handshake was completed" client.log.cleaner
+            rlAssertGrep "This is a resumed session" client.log.cleaner
         fi
         rlRun "kill $openssl_pid"
         rlRun "rlWait -s 9 $openssl_pid" 143
         [[ $DEBUG ]] && rlRun "rlWait -s 9 $sleep_pid"
         [[ $DEBUG ]] && rlRun "kill $tcpdump_pid"
         [[ $DEBUG ]] && rlRun "rlWait -s 9 $tcpdump_pid"
-        if ! rlGetPhaseState; then
+        rlGetPhaseState
+        if [[ $ECODE -gt $START_ECODE ]]; then
             rlRun "cat server.log" 0 "Server stdout"
             rlRun "cat server.err" 0 "Server stderr"
             rlRun "cat client.log" 0 "Client output"
             [[ $DEBUG ]] && bash
         fi
-    rlPhaseEnd
+    if [[ $tls13interop_no_phases ]]; then
+        rlLogInfo "::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::"
+        rlLogInfo ""
+    else
+        rlPhaseEnd
+    fi
 
     unset SSLKEYLOGFILE
 }
@@ -678,7 +784,7 @@ tls13interop_gnutls_openssl_test_all_for_cert() { local cert=$1
           if $FIPS && [[ $c_name = TLS_CHACHA20_POLY1305_SHA256 ]]; then
               continue;
           fi
-          if $FIPS && [[ $g_name = X25519 ]]; then
+          if $FIPS && ( [[ $g_name = X25519 ]] || [[ $g_name = X448 ]] ); then
               continue
           fi
 

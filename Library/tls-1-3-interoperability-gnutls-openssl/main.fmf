@@ -1,5 +1,6 @@
-summary: Test TLS 1.3 interoperability between GnuTLS and OpenSSL
-description: ''
+summary: Test TLS 1.3 interoperability between GnuTLS and OpenSSL (shared code library)
+description: |
+    TLS 1.3 unsupported in RHEL-7 OpenSSL and GnuTLS
 contact: Alexander Sosedkin <asosedki@redhat.com>
 component:
   - openssl
@@ -7,23 +8,23 @@ component:
 test: ./runtest.sh
 framework: beakerlib
 require:
-recommend:
   - expect
   - gnutls
   - gnutls-utils
   - openssl
   - tcpdump
-duration: 40m
+duration: 15m
 enabled: true
 tag:
   - NoRHEL4
   - NoRHEL5
   - NoRHEL6
   - NoRHEL7
-  - Tier2
-tier: '2'
+  - TIPpass_Security
+  - Tier1
+tier: '1'
 link:
-  - relates: https://bugzilla.redhat.com/show_bug.cgi?id=1677754
+  - relates: https://bugzilla.redhat.com/show_bug.cgi?id=1983676
   - relates: https://bugzilla.redhat.com/show_bug.cgi?id=1952615
 adjust:
   - because: gnutls and openssl don't support tls1.3 on rhel-7 and earlier
@@ -33,6 +34,6 @@ adjust:
   - enabled: false
     when: distro == rhel-alt
     continue: false
-extra-nitrate: TC#0602837
-extra-summary: /CoreOS/openssl/Interoperability/tls-1-3-interoperability-gnutls-openssl-2way
-extra-task: /CoreOS/openssl/Interoperability/tls-1-3-interoperability-gnutls-openssl-2way
+extra-nitrate: TC#0602315
+extra-summary: /CoreOS/openssl/Library/tls-1-3-interoperability-gnutls-openssl
+extra-task: /CoreOS/openssl/Library/tls-1-3-interoperability-gnutls-openssl

@@ -19,7 +19,7 @@ expect {
     timeout { send_user "3rd Verify timeout" }
 }
 expect {
-    -ex "---" { }
+    -gl "---*read R BLOCK" { }
     eof { exit 11 }
     timeout { exit 12 }
 }

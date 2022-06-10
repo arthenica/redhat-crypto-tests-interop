@@ -1,6 +1,6 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-#   Makefile of /CoreOS/openssl/Interoperability/tls-1-3-interoperability-gnutls-openssl-2way
+#   Makefile of /CoreOS/openssl/Interoperability/tls-1-3-interoperability-gnutls-openssl
 #   Description: Test TLS 1.3 interoperability between GnuTLS and OpenSSL
 #   Author: Hubert Kario <hkario@redhat.com>
 #
@@ -24,18 +24,12 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-export TEST=/CoreOS/openssl/Interoperability/tls-1-3-interoperability-gnutls-openssl-2way
+export TEST=/CoreOS/openssl/Library/tls-1-3-interoperability-gnutls-openssl
 export TESTVERSION=1.0
 
 BUILT_FILES=
 
-FILES=$(METADATA) runtest.sh Makefile PURPOSE 2way.csv 2way.fips.csv 2way-9.0.csv 2way-9.0.fips.csv
-
-#2way.csv: ../../Library/tls-1-3-interoperability-gnutls-openssl/acts-config.txt
-#	java -Ddoi=2 -Doutput=csv -jar $(ACTS_JAR) $< $@
-#
-#2way.fips.csv: ../../Library/tls-1-3-interoperability-gnutls-openssl/acts-config.fips.txt
-#	java -Ddoi=2 -Doutput=csv -jar $(ACTS_JAR) $< $@
+FILES=$(METADATA) lib.sh runtest.sh Makefile PURPOSE gnutls-client.expect gnutls-resume.expect openssl-client.expect openssl-rekey.expect
 
 .PHONY: all install download clean
 
@@ -51,16 +45,17 @@ clean:
 
 include /usr/share/rhts/lib/rhts-make.include
 
+# Requires is broken for libraries: http://wiki.test.redhat.com/BaseOs/BeakerLibraries/DevelDoc
 $(METADATA): Makefile
 	@echo "Owner:           Hubert Kario <hkario@redhat.com>" > $(METADATA)
 	@echo "Name:            $(TEST)" >> $(METADATA)
 	@echo "TestVersion:     $(TESTVERSION)" >> $(METADATA)
 	@echo "Path:            $(TEST_DIR)" >> $(METADATA)
-	@echo "Description:     Test TLS 1.3 interoperability between GnuTLS and OpenSSL" >> $(METADATA)
-	@echo "Type:            Interoperability" >> $(METADATA)
-	@echo "TestTime:        40m" >> $(METADATA)
+	@echo "Description:     Test TLS 1.3 interoperability between GnuTLS and OpenSSL (shared code library)" >> $(METADATA)
+	@echo "Type:            Library" >> $(METADATA)
+	@echo "TestTime:        15m" >> $(METADATA)
 	@echo "RunFor:          gnutls openssl" >> $(METADATA)
-	@echo "Requires:        expect gnutls gnutls-utils openssl tcpdump" >> $(METADATA)
+	@echo "Provides:        library(openssl/tls-1-3-interoperability-gnutls-openssl)" >> $(METADATA)
 	@echo "Priority:        Normal" >> $(METADATA)
 	@echo "License:         GPLv2" >> $(METADATA)
 	@echo "Confidential:    no" >> $(METADATA)

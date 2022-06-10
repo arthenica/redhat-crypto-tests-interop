@@ -25,7 +25,6 @@
 #   Boston, MA 02110-1301, USA.
 
 # Include Beaker environment
-. /usr/bin/rhts-environment.sh || exit 1
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 
 PACKAGE="openssl"
@@ -34,8 +33,8 @@ PACKAGES="openssl gnutls"
 rlJournalStart
     rlPhaseStartSetup
         rlAssertRpm --all
-        #rlRun "rlImport crypto/fips"
-        rlRun "rlImport openssl/tls-1-3-interoperability-gnutls-openssl"
+        rlRun "rlImport distribution/fips"
+        rlRun ". lib.sh"
         rlRun "TmpDir=\$(mktemp -d)" 0 "Creating tmp directory"
         rlRun "pushd $TmpDir"
 
@@ -60,15 +59,35 @@ rlJournalStart
     tls13interop_gnutls_openssl_test \
         ecdsa-p521 TLS_AES_128_GCM_SHA256       default default  '' '' ''
 
-#    if ! fipsIsEnabled; then
+    if ! fipsIsEnabled; then
         tls13interop_gnutls_openssl_test \
             rsa TLS_CHACHA20_POLY1305_SHA256    SHA512  X25519 \
             ' HRR' ' resume' ' key update'
-#    else
-#        tls13interop_gnutls_openssl_test \
-#            rsa TLS_AES_128_GCM_SHA256          SHA512  P-256 \
-#            ' HRR' ' resume' ' key update'
-#    fi
+
+        if ( ! rlIsRHEL '<9' ) && ! rlIsFedora; then
+            # GnuTLS supports ed25519 and ed448 since RHEL-9
+            tls13interop_gnutls_openssl_test \
+                ed25519 TLS_AES_128_GCM_SHA256 default X25519 \
+                ' HRR' ' resume' ' key update'
+
+            # note that Ed448 is broken in RHEL-9 beta: RHBZ#1983676
+            tls13interop_gnutls_openssl_test \
+                ed448 TLS_CHACHA20_POLY1305_SHA256 default X448 '' '' ''
+        fi
+    else
+        tls13interop_gnutls_openssl_test \
+            rsa TLS_AES_128_GCM_SHA256          SHA512  P-256 \
+            ' HRR' ' resume' ' key update'
+    fi
+
+    if ( ! rlIsRHEL '<9' ) && ! rlIsFedora; then
+        tls13interop_gnutls_openssl_test \
+            rsa TLS_AES_128_GCM_SHA256 SHA256 FFDHE2048 '' '' ''
+
+        tls13interop_gnutls_openssl_test \
+            rsa TLS_AES_128_GCM_SHA256 SHA512 FFDHE8192 \
+            ' HRR' ' resume' ' key update'
+    fi
 
     rlPhaseStartCleanup
         rlRun "popd"

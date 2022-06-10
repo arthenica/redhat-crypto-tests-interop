@@ -1,0 +1,29 @@
+summary: Library for creating X.509 certificates for any use
+description: ''
+contact: Hubert  Kario <hkario@redhat.com>
+component:
+  - openssl
+test: ./runtest.sh
+framework: beakerlib
+require:
+  - openssl
+recommend:
+  - openssl
+duration: 45m
+enabled: true
+tag:
+  - CI-Tier-1
+  - TIPpass_Security
+  - Tier1
+  - Tier1security
+tier: '1'
+link:
+  - relates: https://bugzilla.redhat.com/show_bug.cgi?id=1952878
+  - relates: https://bugzilla.redhat.com/show_bug.cgi?id=1926366
+adjust:
+  - enabled: false
+    when: distro == rhel-3
+    continue: false
+extra-nitrate: TC#0377821
+extra-summary: '[x509] Library for easy generation of complex certificates (openssl/certgen)'
+extra-task: /CoreOS/openssl/Library/certgen
