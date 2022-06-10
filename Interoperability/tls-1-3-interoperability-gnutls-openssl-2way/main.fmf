@@ -21,6 +21,7 @@ tag:
   - NoRHEL6
   - NoRHEL7
   - Tier2
+  - interop
 tier: '2'
 link:
   - relates: https://bugzilla.redhat.com/show_bug.cgi?id=1677754

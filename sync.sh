@@ -39,9 +39,6 @@ for t in ${TESTS[@]}; do
     echo
     echo $t
     #test -r $source_root/$t/runtest.sh || fail "$t: no test script" # TODO why are we doing this?
-    if [[ ${t%%/*} != "distribution" && ! -r $source_root/$t/main.fmf ]]; then
-        fail "$t: no metadata"
-    fi
 
     sdir="$source_root/$t"
     debug "Source dir: $sdir"
@@ -70,10 +67,16 @@ for t in ${TESTS[@]}; do
         echo "  Libname: $lib = $libc / $libn"
         sed -i "s|rlImport[ ]*$libc[ ]*/[ ]*$libn|rlImport $libn|g" $ddir/$scriptfile
     done < <(cat $ddir/$scriptfile |grep '^[^#]*rlImport')
-    if [[ -r $ddir/main.fmf ]]; then
-        echo "  FMF medatada"
+
+    echo "  FMF medatada"
+    if [[ ${t%%/*} != "distribution" && ! -r $source_root/$t/main.fmf ]]; then
+        fail "$t: no metadata"
+    else
         sed -i "/[ ]*-[ ]*library[ ]*([^)]*)/d" $ddir/main.fmf # remove libs from long lists
         sed -i "s/library[ ]*([^)]*)[ ,]*//g" $ddir/main.fmf # remove libs from short lists
+    fi
+    if [[ $scriptfile = "runtest.sh" && -r $ddir/main.fmf ]]; then
+        grep -qw interop $ddir/main.fmf || fail "no 'interop' tag"
     fi
     if [[ -r $ddir/Makefile ]]; then
         echo "  Makefile"
