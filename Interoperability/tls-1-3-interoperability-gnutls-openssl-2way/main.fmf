@@ -22,6 +22,9 @@ tag:
   - NoRHEL7
   - Tier2
   - interop
+  - interop-gnutls
+  - interop-openssl
+  - interop-2way
 tier: '2'
 link:
   - relates: https://bugzilla.redhat.com/show_bug.cgi?id=1677754

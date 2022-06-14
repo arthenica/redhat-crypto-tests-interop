@@ -26,6 +26,9 @@ tag:
   - results-yesterday-stable
   - tipx
   - interop
+  - interop-gnutls
+  - interop-nss
+  - interop-3way
 link:
   - relates: https://bugzilla.redhat.com/show_bug.cgi?id=1677754
   - relates: https://bugzilla.redhat.com/show_bug.cgi?id=1724250
