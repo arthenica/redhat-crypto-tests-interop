@@ -1,3 +1,3 @@
-# experimental-interop
+# TLS interoperability tests
 
-Experimental repo for running TLS interoperability tests in FMF format in upstream projects.
+TLS interoperability tests in FMF format for upstream projects' CI systems.
