@@ -1,5 +1,5 @@
 #!/usr/bin/expect
-set timeout 10
+set timeout 30
 spawn /bin/sh -c "$argv"
 expect {
     "Verify return code: 0" { }

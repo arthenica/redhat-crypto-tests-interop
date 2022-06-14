@@ -1,0 +1,69 @@
+# ACTS Test Suite Generation: Thu Aug 01 17:01:38 CEST 2019
+#  '*' represents don't care value 
+# Degree of interaction coverage: 2
+# Number of parameters: 6
+# Maximum number of values per parameter: 10
+# Number of configurations: 62
+cert,c_name,c_sig,g_name,HRR,resume
+rsa,TLS_AES_256_GCM_SHA384,SHA256,default,false,false
+rsa-pss,TLS_CHACHA20_POLY1305_SHA256,SHA384,default,false,true
+ecdsa-p256,TLS_AES_128_GCM_SHA256,default,default,false,false
+ecdsa-p384,TLS_AES_256_GCM_SHA384,default,default,false,true
+ecdsa-p521,TLS_CHACHA20_POLY1305_SHA256,default,default,false,false
+rsa,TLS_AES_128_GCM_SHA256,SHA512,P-256,true,true
+rsa-pss,TLS_AES_256_GCM_SHA384,SHA256,P-256,true,false
+ecdsa-p256,TLS_CHACHA20_POLY1305_SHA256,default,P-256,true,true
+ecdsa-p384,TLS_AES_128_GCM_SHA256,default,P-256,true,false
+ecdsa-p521,TLS_AES_256_GCM_SHA384,default,P-256,true,true
+rsa,TLS_CHACHA20_POLY1305_SHA256,SHA384,P-384,true,false
+rsa-pss,TLS_AES_128_GCM_SHA256,SHA512,P-384,false,true
+ecdsa-p256,TLS_AES_256_GCM_SHA384,default,P-384,true,false
+ecdsa-p384,TLS_CHACHA20_POLY1305_SHA256,default,P-384,false,false
+ecdsa-p521,TLS_AES_128_GCM_SHA256,default,P-384,false,true
+rsa,TLS_AES_256_GCM_SHA384,default,P-521,true,false
+rsa-pss,TLS_CHACHA20_POLY1305_SHA256,SHA256,P-521,false,true
+ecdsa-p256,TLS_AES_128_GCM_SHA256,default,P-521,true,true
+ecdsa-p384,TLS_AES_256_GCM_SHA384,default,P-521,false,true
+ecdsa-p521,TLS_CHACHA20_POLY1305_SHA256,default,P-521,false,true
+rsa,TLS_AES_256_GCM_SHA384,SHA384,X25519,true,false
+rsa-pss,TLS_CHACHA20_POLY1305_SHA256,default,X25519,false,true
+ecdsa-p256,TLS_AES_128_GCM_SHA256,default,X25519,false,false
+ecdsa-p384,TLS_AES_256_GCM_SHA384,default,X25519,false,false
+ecdsa-p521,TLS_AES_256_GCM_SHA384,default,X25519,true,false
+rsa,TLS_AES_256_GCM_SHA384,SHA512,FFDHE2048,true,false
+rsa-pss,TLS_AES_128_GCM_SHA256,SHA256,FFDHE2048,false,true
+ecdsa-p256,TLS_CHACHA20_POLY1305_SHA256,default,FFDHE2048,false,false
+ecdsa-p384,TLS_CHACHA20_POLY1305_SHA256,default,FFDHE2048,true,true
+ecdsa-p521,TLS_AES_128_GCM_SHA256,default,FFDHE2048,true,true
+rsa,TLS_AES_128_GCM_SHA256,SHA384,FFDHE3072,true,false
+rsa-pss,TLS_CHACHA20_POLY1305_SHA256,SHA512,FFDHE3072,false,true
+ecdsa-p256,TLS_AES_256_GCM_SHA384,default,FFDHE3072,true,true
+ecdsa-p384,TLS_AES_256_GCM_SHA384,default,FFDHE3072,true,false
+ecdsa-p521,TLS_AES_256_GCM_SHA384,default,FFDHE3072,false,false
+rsa,TLS_CHACHA20_POLY1305_SHA256,SHA256,FFDHE4096,true,false
+rsa-pss,TLS_AES_128_GCM_SHA256,SHA384,FFDHE4096,false,true
+ecdsa-p256,TLS_AES_256_GCM_SHA384,default,FFDHE4096,false,false
+ecdsa-p384,TLS_AES_256_GCM_SHA384,default,FFDHE4096,true,true
+ecdsa-p521,TLS_AES_128_GCM_SHA256,default,FFDHE4096,true,true
+rsa,TLS_CHACHA20_POLY1305_SHA256,SHA512,FFDHE6144,true,false
+rsa-pss,TLS_AES_128_GCM_SHA256,SHA256,FFDHE6144,false,true
+ecdsa-p256,TLS_AES_256_GCM_SHA384,default,FFDHE6144,true,false
+ecdsa-p384,TLS_AES_128_GCM_SHA256,default,FFDHE6144,true,true
+ecdsa-p521,TLS_AES_128_GCM_SHA256,default,FFDHE6144,false,true
+rsa,TLS_CHACHA20_POLY1305_SHA256,SHA384,FFDHE8192,true,false
+rsa-pss,TLS_AES_128_GCM_SHA256,SHA512,FFDHE8192,false,true
+ecdsa-p256,TLS_AES_256_GCM_SHA384,default,FFDHE8192,false,false
+ecdsa-p384,TLS_AES_256_GCM_SHA384,default,FFDHE8192,false,false
+ecdsa-p521,TLS_AES_128_GCM_SHA256,default,FFDHE8192,false,true
+rsa,TLS_AES_256_GCM_SHA384,SHA256,P-384,false,true
+rsa,TLS_AES_128_GCM_SHA256,SHA256,X25519,true,false
+rsa,TLS_AES_256_GCM_SHA384,SHA256,FFDHE3072,false,false
+rsa-pss,TLS_CHACHA20_POLY1305_SHA256,SHA256,FFDHE8192,false,true
+rsa-pss,TLS_CHACHA20_POLY1305_SHA256,SHA384,P-256,false,true
+rsa-pss,TLS_AES_256_GCM_SHA384,SHA384,P-521,true,false
+rsa-pss,TLS_CHACHA20_POLY1305_SHA256,SHA384,FFDHE2048,true,true
+rsa,TLS_AES_128_GCM_SHA256,SHA384,FFDHE6144,false,false
+rsa,TLS_CHACHA20_POLY1305_SHA256,SHA512,default,false,true
+rsa-pss,TLS_AES_128_GCM_SHA256,SHA512,P-521,false,false
+rsa-pss,TLS_AES_256_GCM_SHA384,SHA512,X25519,false,true
+rsa-pss,TLS_AES_128_GCM_SHA256,SHA512,FFDHE4096,true,false

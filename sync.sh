@@ -28,7 +28,11 @@ TESTS=(
         "distribution/Library/fips"
         "openssl/Library/certgen"
         "openssl/Library/tls-1-3-interoperability-gnutls-openssl"
+        "gnutls/Library/tls-1-3-interoperability-gnutls-nss/"
         "openssl/Interoperability/tls-1-3-interoperability-gnutls-openssl-2way"
+        "gnutls/Interoperability/tls-1-3-interoperability-gnutls-nss-2way"
+        "openssl/Interoperability/tls-1-3-interoperability-gnutls-openssl-3way"
+        "gnutls/Interoperability/tls-1-3-interoperability-gnutls-nss-3way"
 )
 
 dest_libname="crypto"
@@ -70,8 +74,9 @@ for t in ${TESTS[@]}; do
 
     echo "  FMF medatada"
     if [[ ${t%%/*} != "distribution" && ! -r $source_root/$t/main.fmf ]]; then
-        fail "$t: no metadata"
-    else
+        fail "$t: no FMF metadata"
+    fi
+    if [[ -r $source_root/$t/main.fmf ]]; then
         sed -i "/[ ]*-[ ]*library[ ]*([^)]*)/d" $ddir/main.fmf # remove libs from long lists
         sed -i "s/library[ ]*([^)]*)[ ,]*//g" $ddir/main.fmf # remove libs from short lists
     fi
