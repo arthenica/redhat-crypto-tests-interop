@@ -1,0 +1,48 @@
+summary: Test TLS 1.3 interoperability between GnuTLS and OpenSSL
+description: ''
+contact: Hubert Kario <hkario@redhat.com>
+component:
+  - openssl
+  - gnutls
+test: ./runtest.sh
+framework: beakerlib
+require:
+recommend:
+  - expect
+  - gnutls
+  - gnutls-utils
+  - openssl
+  - tcpdump
+duration: 24h
+enabled: true
+tag:
+  - NoRHEL4
+  - NoRHEL5
+  - NoRHEL6
+  - NoRHEL7
+  - NoTier
+  - notip
+  - very_slow
+  - interop
+  - interop-gnutls
+  - interop-openssl
+  - interop-rsae
+link:
+  - relates: https://bugzilla.redhat.com/show_bug.cgi?id=1516737
+  - relates: https://bugzilla.redhat.com/show_bug.cgi?id=1595338
+  - relates: https://bugzilla.redhat.com/show_bug.cgi?id=1373162
+  - relates: https://bugzilla.redhat.com/show_bug.cgi?id=1595347
+  - relates: https://bugzilla.redhat.com/show_bug.cgi?id=1611701
+  - relates: https://bugzilla.redhat.com/show_bug.cgi?id=1677754
+  - relates: https://bugzilla.redhat.com/show_bug.cgi?id=1516732
+adjust:
+  - because: gnutls and openssl don't support tls1.3 on rhel-7 and earlier
+    enabled: false
+    when: distro < rhel-8
+    continue: false
+  - enabled: false
+    when: distro == rhel-alt
+    continue: false
+extra-nitrate: TC#0575309
+extra-summary: /CoreOS/openssl/Interoperability/tls-1-3-interoperability-gnutls-openssl-rsae
+extra-task: /CoreOS/openssl/Interoperability/tls-1-3-interoperability-gnutls-openssl-rsae

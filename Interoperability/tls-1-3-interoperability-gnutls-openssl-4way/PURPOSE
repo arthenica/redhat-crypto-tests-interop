@@ -1,0 +1,3 @@
+PURPOSE of /CoreOS/openssl/Interoperability/tls-1-3-interoperability-gnutls-openssl-4way
+Description: Test TLS 1.3 interoperability between GnuTLS and OpenSSL
+Author: Hubert Kario <hkario@redhat.com>

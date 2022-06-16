@@ -25,17 +25,27 @@ dest_root="$( cd -- "$( dirname -- "${BASH_SOURCE[0]:-$0}"; )" &> /dev/null && p
 echo "Destination root: $dest_root"
 
 TESTS=(
+        # libraries
         "distribution/Library/fips"
         "openssl/Library/certgen"
         "openssl/Library/tls-1-3-interoperability-gnutls-openssl"
         "gnutls/Library/tls-1-3-interoperability-gnutls-nss/"
+        # tests
+        #"openssl/Interoperability/tls-1-3-interoperability-gnutls-openssl-2way"
+        #"gnutls/Interoperability/tls-1-3-interoperability-gnutls-nss-2way"
+        #"openssl/Interoperability/tls-1-3-interoperability-gnutls-openssl-3way"
+        #"gnutls/Interoperability/tls-1-3-interoperability-gnutls-nss-3way"
         "openssl/Interoperability/tls-1-3-interoperability-gnutls-openssl-2way"
-        "gnutls/Interoperability/tls-1-3-interoperability-gnutls-nss-2way"
         "openssl/Interoperability/tls-1-3-interoperability-gnutls-openssl-3way"
-        "gnutls/Interoperability/tls-1-3-interoperability-gnutls-nss-3way"
+        "openssl/Interoperability/tls-1-3-interoperability-gnutls-openssl-4way"
+        "openssl/Interoperability/tls-1-3-interoperability-gnutls-openssl-5way"
+        "openssl/Interoperability/tls-1-3-interoperability-gnutls-openssl-p256"
+        "openssl/Interoperability/tls-1-3-interoperability-gnutls-openssl-p384"
+        "openssl/Interoperability/tls-1-3-interoperability-gnutls-openssl-p521"
+        "openssl/Interoperability/tls-1-3-interoperability-gnutls-openssl-rsae"
+        "openssl/Interoperability/tls-1-3-interoperability-gnutls-openssl-rsapss"
 )
 
-dest_libname="crypto"
 repourl="https://gitlab.com/redhat-crypto/tests/experimental-interop.git"
 reponame="experimental-interop"
 
