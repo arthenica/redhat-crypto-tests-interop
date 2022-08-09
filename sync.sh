@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# How to run this:
+#   bash <path_to_dir>/sync.sh <path_to_root_of_downstream_test_git_repos>
+
 fail() {
     if [[ -n $1 ]]; then
         message="Error: $1"
@@ -30,11 +33,7 @@ TESTS=(
         "openssl/Library/certgen"
         "openssl/Library/tls-1-3-interoperability-gnutls-openssl"
         "gnutls/Library/tls-1-3-interoperability-gnutls-nss/"
-        # tests
-        #"openssl/Interoperability/tls-1-3-interoperability-gnutls-openssl-2way"
-        #"gnutls/Interoperability/tls-1-3-interoperability-gnutls-nss-2way"
-        #"openssl/Interoperability/tls-1-3-interoperability-gnutls-openssl-3way"
-        #"gnutls/Interoperability/tls-1-3-interoperability-gnutls-nss-3way"
+        # tests: openssl <-> gnutls
         "openssl/Interoperability/tls-1-3-interoperability-gnutls-openssl-2way"
         "openssl/Interoperability/tls-1-3-interoperability-gnutls-openssl-3way"
         "openssl/Interoperability/tls-1-3-interoperability-gnutls-openssl-4way"
@@ -44,15 +43,16 @@ TESTS=(
         "openssl/Interoperability/tls-1-3-interoperability-gnutls-openssl-p521"
         "openssl/Interoperability/tls-1-3-interoperability-gnutls-openssl-rsae"
         "openssl/Interoperability/tls-1-3-interoperability-gnutls-openssl-rsapss"
+        # tests: nss <-> gnutls (TODO)
+        # tests: nss <-> openssl (TODO)
 )
 
-repourl="https://gitlab.com/redhat-crypto/tests/experimental-interop.git"
-reponame="experimental-interop"
+repourl="https://gitlab.com/redhat-crypto/tests/interop.git"
+reponame="interop"
 
 for t in ${TESTS[@]}; do
     echo
     echo $t
-    #test -r $source_root/$t/runtest.sh || fail "$t: no test script" # TODO why are we doing this?
 
     sdir="$source_root/$t"
     debug "Source dir: $sdir"
