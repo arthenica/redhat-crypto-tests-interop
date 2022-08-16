@@ -34,6 +34,9 @@ PACKAGES='openssl nss'
 
 TWAY=2
 
+SLICE_TOTAL=${SLICE_TOTAL:-1}
+SLICE_ID=${SLICE_ID:-0}
+
 rlJournalStart
     rlPhaseStartSetup
         rlAssertRpm --all
@@ -72,6 +75,9 @@ rlJournalStart
         [[ $g_type == 'true' ]] && g_type=' HRR' || g_type=''
         [[ $sess_type == 'true' ]] && sess_type=' resume' || sess_type=''
 
+        if ! (( $CONF_COUNTER % $SLICE_TOTAL == $SLICE_ID )); then
+            continue
+        fi
         tls13interop_gnutls_nss_test \
             "$cert" "$c_name" "$c_sig" "$g_name" \
             "$g_type" "$sess_type" ''
