@@ -75,16 +75,15 @@ rlJournalStart
         [[ $g_type == 'true' ]] && g_type=' HRR' || g_type=''
         [[ $sess_type == 'true' ]] && sess_type=' resume' || sess_type=''
 
-        if ! (( $CONF_COUNTER % $SLICE_TOTAL == $SLICE_ID )); then
-            continue
-        fi
-        tls13interop_gnutls_nss_test \
-            "$cert" "$c_name" "$c_sig" "$g_name" \
-            "$g_type" "$sess_type" ''
+        if (( $CONF_COUNTER % $SLICE_TOTAL == $SLICE_ID )); then
+            tls13interop_gnutls_nss_test \
+                "$cert" "$c_name" "$c_sig" "$g_name" \
+                "$g_type" "$sess_type" ''
 
-        tls13interop_gnutls_nss_test \
-            "$cert" "$c_name" "$c_sig" "$g_name" \
-            "$g_type" "$sess_type" ' key update'
+            tls13interop_gnutls_nss_test \
+                "$cert" "$c_name" "$c_sig" "$g_name" \
+                "$g_type" "$sess_type" ' key update'
+        fi
 
         let CONF_COUNTER+=1
     done < $TEST_DIR/$TWAY_CSV
