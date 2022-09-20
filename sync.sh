@@ -43,6 +43,7 @@ TESTS=(
         "openssl/Interoperability/tls-1-3-interoperability-gnutls-openssl-p521"
         "openssl/Interoperability/tls-1-3-interoperability-gnutls-openssl-rsae"
         "openssl/Interoperability/tls-1-3-interoperability-gnutls-openssl-rsapss"
+        "gnutls/Interoperability/TLSv1-2-with-OpenSSL"
         # tests: nss <-> gnutls (TODO)
         # tests: nss <-> openssl (TODO)
 )
