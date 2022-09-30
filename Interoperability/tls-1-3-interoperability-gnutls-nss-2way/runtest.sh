@@ -34,6 +34,9 @@ PACKAGES='openssl nss'
 
 TWAY=2
 
+SLICE_TOTAL=${SLICE_TOTAL:-1}
+SLICE_ID=${SLICE_ID:-0}
+
 rlJournalStart
     rlPhaseStartSetup
         rlAssertRpm --all
@@ -52,14 +55,18 @@ rlJournalStart
 
         tls13interop_gnutls_nss_setup
 
-        CONF_COUNTER=0
-        CONF_TOTAL=$(grep '^# Number of configurations' $TEST_DIR/$TWAY_CSV | \
-                     sed -E 's/# Number of configurations: ([0-9]+)/\1/')
-        [[ "$CONF_TOTAL" -gt 0 ]] || \
+        CONF_ITERATED_COUNTER=0
+        CONF_ITERATED_TOTAL=$(grep '^# Number of configurations' $TEST_DIR/$TWAY_CSV | \
+                              sed -E 's/# Number of configurations: ([0-9]+)/\1/')
+        [[ "$CONF_ITERATED_TOTAL" -gt 0 ]] || \
             rlDie 'Configuration number detection problem'
-        rlLog "Gotta test $CONF_TOTAL configuration"
+        rlLog "Total $CONF_ITERATED_TOTAL configurations, slice $SLICE_ID of $SLICE_TOTAL"
+        if (( SLICE_ID >= SLICE_TOTAL )); then
+            rlFail "More slices than declared ($SLICE_ID >= $SLICE_TOTAL)"
+        fi
     rlPhaseEnd
 
+    CONF_TESTED_COUNTER=0
     while read LINE; do
         if [[ $LINE = \#* ]]; then
             continue
@@ -72,21 +79,33 @@ rlJournalStart
         [[ $g_type == 'true' ]] && g_type=' HRR' || g_type=''
         [[ $sess_type == 'true' ]] && sess_type=' resume' || sess_type=''
 
-        tls13interop_gnutls_nss_test \
-            "$cert" "$c_name" "$c_sig" "$g_name" \
-            "$g_type" "$sess_type" ''
+        if (( CONF_ITERATED_COUNTER % SLICE_TOTAL == SLICE_ID )); then
+            (( CONF_TESTED_COUNTER+=1 ))
 
-        tls13interop_gnutls_nss_test \
-            "$cert" "$c_name" "$c_sig" "$g_name" \
-            "$g_type" "$sess_type" ' key update'
+            tls13interop_gnutls_nss_test \
+                "$cert" "$c_name" "$c_sig" "$g_name" \
+                "$g_type" "$sess_type" ''
 
-        let CONF_COUNTER+=1
+            tls13interop_gnutls_nss_test \
+                "$cert" "$c_name" "$c_sig" "$g_name" \
+                "$g_type" "$sess_type" ' key update'
+        fi
+
+        (( CONF_ITERATED_COUNTER += 1 ))
     done < $TEST_DIR/$TWAY_CSV
 
-    rlPhaseStartTest "Check that we have tested $CONF_TOTAL configurations"
-        rlAssertEquals "We have tested $CONF_COUNTER confugurations, \
-                        should be $CONF_TOTAL" \
-                       "$CONF_COUNTER" "$CONF_TOTAL"
+    rlPhaseStartTest "Check that we did everything we expected"
+        rlAssertEquals "We have iterated over $CONF_ITERATED_COUNTER configurations, "`
+                      `"should be $CONF_ITERATED_TOTAL" \
+                       "$CONF_ITERATED_COUNTER" "$CONF_ITERATED_TOTAL"
+        CONF_TESTED_TOTAL=$(( CONF_ITERATED_TOTAL / SLICE_TOTAL ))
+        if (( CONF_ITERATED_TOTAL % SLICE_TOTAL != 0
+                && SLICE_ID < CONF_ITERATED_TOTAL % SLICE_TOTAL )); then
+            (( CONF_TESTED_TOTAL += 1 ))
+        fi
+        rlAssertEquals "We have actually tested $CONF_TESTED_COUNTER configurations, "`
+                      `"should be $CONF_TESTED_TOTAL" \
+                       "$CONF_TESTED_COUNTER" "$CONF_TESTED_TOTAL"
     rlPhaseEnd
 
     rlPhaseStartCleanup

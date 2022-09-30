@@ -63,6 +63,8 @@ rlJournalStart
         rlLog "Gotta test $CONF_TOTAL configuration"
     rlPhaseEnd
 
+    export tls13interop_no_phases="true"
+    rlPhaseStartTest
     while read LINE; do
         if [[ $LINE = \#* ]]; then
             continue
@@ -80,6 +82,7 @@ rlJournalStart
             "$g_type" "$sess_type" "$k_update"
         let CONF_COUNTER+=1
     done < $TEST_DIR/$TWAY_CSV
+    rlPhaseEnd
 
     rlPhaseStartTest "Check that we have tested $CONF_TOTAL configurations"
         rlAssertEquals "We have tested $CONF_COUNTER configurations, \
