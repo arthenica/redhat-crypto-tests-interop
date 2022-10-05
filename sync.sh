@@ -49,6 +49,11 @@ TESTS=(
         # tests: nss <-> openssl (TODO)
 )
 
+EXCLUDED_FILES=(
+        # files to be excluded in rsync
+        "expectedness.yml"
+)
+
 repourl="https://gitlab.com/redhat-crypto/tests/interop.git"
 reponame="interop"
 
@@ -62,7 +67,9 @@ for t in ${TESTS[@]}; do
     debug "Dest dir: $ddir"
     mkdir -p $ddir
     debug "$sdir -> $ddir"
-    rsync -a $sdir/ $ddir/ || fail "rsync"
+    EXCLUDE=""
+    for i in ${EXCLUDED_FILES[@]}; do EXCLUDE="$EXCLUDE --exclude ${i}"; done;
+    rsync -a $EXCLUDE $sdir/ $ddir/ || fail "rsync"
 
     if [[ -r $ddir/lib.sh ]]; then
         debug "Handling test library"
