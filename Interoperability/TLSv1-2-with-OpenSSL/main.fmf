@@ -26,6 +26,7 @@ tag:
   - interop
   - interop-openssl
   - interop-gnutls
+  - interop-basic
 tier: '2'
 link:
   - relates: https://bugzilla.redhat.com/show_bug.cgi?id=1321112
@@ -45,3 +46,4 @@ adjust:
 extra-nitrate: TC#0521608
 extra-summary: /CoreOS/gnutls/Interoperability/TLSv1-2-with-OpenSSL
 extra-task: /CoreOS/gnutls/Interoperability/TLSv1-2-with-OpenSSL
+id: 90700328-d173-4be7-8ee8-079e79b9c39d
