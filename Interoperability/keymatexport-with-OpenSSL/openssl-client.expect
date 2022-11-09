@@ -1,0 +1,21 @@
+#!/usr/bin/expect
+set timeout 10
+eval spawn $argv
+# the session tickets may be quite large, so work with large buffers
+match_max 20000
+# the output on TLS 1.1 and 1.2 is different than with TLS 1.3, so do two
+# matches
+expect {
+    "SSL-Session*Verify return code: 0*Keying material exporter*---" { }
+    "Verify return code: 0*Keying material*---*New Session Ticket*---*New Session Ticket*---*read R BLOCK" { }
+    eof { exit 10 }
+    timeout { close; exit 11 }
+}
+send "client hello\r"
+expect {
+    "client hello*client hello" { close }
+    eof { exit 12 }
+    timeout { close; exit 13 }
+}
+set info [wait]
+exit [lindex $info 3]

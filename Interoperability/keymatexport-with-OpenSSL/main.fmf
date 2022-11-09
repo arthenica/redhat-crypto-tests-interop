@@ -1,0 +1,41 @@
+summary: Verify interoperability of GnuTLS keymatexport with OpenSSL
+description: ''
+contact: Hubert  Kario <hkario@redhat.com>
+component:
+  - openssl
+  - gnutls
+test: ./runtest.sh
+framework: beakerlib
+require:
+recommend:
+  - gnutls
+  - gnutls-utils
+  - openssl
+  - expect
+  - crypto-policies-scripts
+duration: 2h
+enabled: true
+tag:
+  - NoRHEL4
+  - NoRHEL5
+  - NoRHEL6
+  - NoRHEL7
+  - Tier3
+  - results-yesterday-stable
+  - interop-gnutls
+  - interop-openssl
+  - interop-other
+tier: '3'
+link:
+  - relates: https://bugzilla.redhat.com/show_bug.cgi?id=1691448
+adjust:
+  - because: gnutls doesn't support key material exporter before RHEL-8
+    enabled: false
+    when: distro == rhel-4, rhel-5, rhel-6, rhel-7, rhel-alt-7
+    continue: false
+  - enabled: false
+    when: distro ~< rhel-8.1
+    continue: false
+extra-nitrate: TC#0602785
+extra-summary: /CoreOS/gnutls/Interoperability/keymatexport-with-OpenSSL
+extra-task: /CoreOS/gnutls/Interoperability/keymatexport-with-OpenSSL

@@ -1,0 +1,42 @@
+summary: Test CC relevant ciphers with openssl and gnutls
+description: |
+    GnuTLS on RHEL-6 and earlier doesn't support ECC
+contact: Hubert  Kario <hkario@redhat.com>
+component:
+  - openssl
+  - gnutls
+test: ./runtest.sh
+framework: beakerlib
+require:
+recommend:
+  - gnutls
+  - openssl
+  - net-tools
+  - gnutls-utils
+  - expect
+  - crypto-policies-scripts
+duration: 90m
+enabled: true
+tag:
+  - NoRHEL4
+  - NoRHEL5
+  - NoRHEL6
+  - Tier3
+  - Tier3security
+  - TierCandidatesPASS
+  - interop-openssl
+  - interop-gnutls
+  - interop-other
+tier: '3'
+link:
+  - relates: https://bugzilla.redhat.com/show_bug.cgi?id=1289754
+  - relates: https://bugzilla.redhat.com/show_bug.cgi?id=1238279
+  - relates: https://bugzilla.redhat.com/show_bug.cgi?id=1714245
+  - relates: https://bugzilla.redhat.com/show_bug.cgi?id=2004915
+adjust:
+  - enabled: false
+    when: distro == rhel-4, rhel-5, rhel-6
+    continue: false
+extra-nitrate: TC#0478997
+extra-summary: /CoreOS/openssl/Interoperability/CC-openssl-with-gnutls
+extra-task: /CoreOS/openssl/Interoperability/CC-openssl-with-gnutls

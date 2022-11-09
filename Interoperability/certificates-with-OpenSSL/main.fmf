@@ -1,0 +1,36 @@
+summary: Verify interoperability of GnuTLS certificates with OpenSSL
+description: ''
+contact: Marek Havrila <mhavrila@redhat.com>
+component:
+  - openssl
+  - gnutls
+test: ./runtest.sh
+framework: beakerlib
+require:
+recommend:
+  - gnutls
+  - gnutls-utils
+  - openssl
+duration: 2h
+enabled: true
+tag:
+  - NoRHEL4
+  - NoRHEL5
+  - NoRHEL6
+  - NoRHEL7
+  - Tier3
+  - results-yesterday-stable
+  - interop-gnutls
+  - interop-openssl
+  - interop-other
+tier: '3'
+link:
+  - relates: https://bugzilla.redhat.com/show_bug.cgi?id=1680510
+adjust:
+  - because: test case not backported to rhel-7 and earlier
+    enabled: false
+    when: distro == rhel-4, rhel-5, rhel-6, rhel-7, rhel-alt-7
+    continue: false
+extra-nitrate: TC#0602799
+extra-summary: /CoreOS/gnutls/Interoperability/certificates-with-OpenSSL
+extra-task: /CoreOS/gnutls/Interoperability/certificates-with-OpenSSL

@@ -1,0 +1,24 @@
+#!/usr/bin/expect
+set timeout 10
+spawn /bin/sh -c "$argv"
+trap { exec kill -SIGTERM [exp_pid] } SIGTERM
+expect {
+    "Handshake was completed" {
+        expect {
+            "Simple Client Mode:" {
+                send "client hello\r"
+                expect {
+                    "server hello" { close; exit 0 }
+                    eof { exit 11 }
+                    timeout { exit 12 }
+                }
+            }
+            eof { exit 12 }
+            timeout { exit 13 }
+        }
+    }
+    eof { exit 14 }
+    timeout { exit 15 }
+}
+set info [wait]
+exit [lindex $info 3]

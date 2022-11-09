@@ -44,7 +44,7 @@ TESTS=(
         "openssl/Interoperability/tls-1-3-interoperability-gnutls-openssl-rsae"
         "openssl/Interoperability/tls-1-3-interoperability-gnutls-openssl-rsapss"
         "gnutls/Interoperability/TLSv1-2-with-OpenSSL"
-        "gnutls/Interoperability/CC-openssl-with-gnutls"
+        "openssl/Interoperability/CC-openssl-with-gnutls"
         "gnutls/Interoperability/certificates-with-OpenSSL"
         "gnutls/Interoperability/keymatexport-with-OpenSSL"
         "gnutls/Interoperability/renegotiation-with-OpenSSL"

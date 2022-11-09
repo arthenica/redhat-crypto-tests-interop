@@ -1,0 +1,19 @@
+#!/usr/bin/expect
+set timeout 10
+spawn /bin/sh -c "$argv"
+expect {
+    "Handshake was completed" {
+        send "client hello\r"
+        expect {
+            "server hello" {
+                    close
+            }
+            eof { exit 12 }
+            timeout { close; exit 13 }
+        }
+    }
+    eof { exit 10 }
+    timeout { close; exit 11 }
+}
+set info [wait]
+exit [lindex $info 3]

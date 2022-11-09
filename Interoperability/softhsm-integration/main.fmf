@@ -1,0 +1,38 @@
+summary: Integration with softhsm PKCS#11 module.
+description: ''
+contact: Stanislav Židek <szidek@redhat.com>
+component:
+  - gnutls
+test: ./runtest.sh
+framework: beakerlib
+recommend:
+  - gnutls
+  - gnutls-utils
+  - softhsm
+duration: 5m
+enabled: true
+tag:
+  - NoRHEL4
+  - NoRHEL5
+  - Tier2
+  - results-yesterday-stable
+  - rhel8-buildroot
+  - rhel9-buildroot
+  - interop-gnutls
+  - interop-openssl
+  - interop-other
+tier: '2'
+link:
+  - relates: https://bugzilla.redhat.com/show_bug.cgi?id=1339453
+  - relates: https://bugzilla.redhat.com/show_bug.cgi?id=1705478
+adjust:
+  - enabled: false
+    when: distro == rhel-4, rhel-5, rhel-6
+    continue: false
+  - because: never seen working on 7.2
+    enabled: false
+    when: distro == rhel-7 and distro ~<= rhel-7.2
+    continue: false
+extra-nitrate: TC#0530568
+extra-summary: /CoreOS/gnutls/Interoperability/softhsm-integration
+extra-task: /CoreOS/gnutls/Interoperability/softhsm-integration

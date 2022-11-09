@@ -1,0 +1,26 @@
+#!/usr/bin/expect
+set timeout 10
+spawn /bin/sh -c "$argv"
+
+expect {
+    "Verify return code: 0 *---" {
+        send "client hello\r"
+        expect {
+            "client hello" {
+                expect {
+                    "client hello" { close; exit 0 }
+                    ":error:" { exit 101 }
+                    eof { exit 102 }
+                    timeout { close; exit 103 }
+                }
+            }
+            ":error:" { exit 104 }
+            eof { exit 105 }
+            timeout { close; exit 106 }
+        }
+    }
+    ":error:" { exit 107 }
+    eof { exit 108 }
+    timeout { close; exit 109 }
+}
+exit 100

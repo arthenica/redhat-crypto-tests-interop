@@ -1,0 +1,37 @@
+summary: Test if renegotiation with OpenSSL works
+description: ''
+contact: Hubert  Kario <hkario@redhat.com>
+component:
+  - openssl
+  - gnutls
+test: ./runtest.sh
+framework: beakerlib
+require:
+recommend:
+  - gnutls
+  - gnutls-utils
+  - openssl
+duration: 10m
+enabled: true
+tag:
+  - CI-Tier-1
+  - NoRHEL4
+  - NoRHEL5
+  - Tier1
+  - Tier1security
+  - results-yesterday-stable
+  - interop-gnutls
+  - interop-openssl
+  - interop-other
+tier: '1'
+adjust:
+  - enabled: false
+    when: distro == rhel-4, rhel-5
+    continue: false
+  - because: never seen working on 7.2
+    enabled: false
+    when: distro == rhel-7 and distro ~<= rhel-7.2
+    continue: false
+extra-nitrate: TC#0525152
+extra-summary: /CoreOS/gnutls/Interoperability/renegotiation-with-OpenSSL
+extra-task: /CoreOS/gnutls/Interoperability/renegotiation-with-OpenSSL
