@@ -44,6 +44,12 @@ TESTS=(
         "openssl/Interoperability/tls-1-3-interoperability-gnutls-openssl-rsae"
         "openssl/Interoperability/tls-1-3-interoperability-gnutls-openssl-rsapss"
         "gnutls/Interoperability/TLSv1-2-with-OpenSSL"
+        "gnutls/Interoperability/CC-openssl-with-gnutls"
+        "gnutls/Interoperability/certificates-with-OpenSSL"
+        "gnutls/Interoperability/keymatexport-with-OpenSSL"
+        "gnutls/Interoperability/renegotiation-with-OpenSSL"
+        "gnutls/Interoperability/resumption-with-OpenSSL"
+        "gnutls/Interoperability/softhsm-integration"
         # tests: nss <-> gnutls (TODO)
         "gnutls/Interoperability/tls-1-3-interoperability-gnutls-nss-2way"
         # tests: nss <-> openssl (TODO)
