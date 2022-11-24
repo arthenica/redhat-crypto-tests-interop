@@ -36,13 +36,6 @@ TESTS=(
         # tests: openssl <-> gnutls
         "openssl/Interoperability/tls-1-3-interoperability-gnutls-openssl-2way"
         "openssl/Interoperability/tls-1-3-interoperability-gnutls-openssl-3way"
-        "openssl/Interoperability/tls-1-3-interoperability-gnutls-openssl-4way"
-        "openssl/Interoperability/tls-1-3-interoperability-gnutls-openssl-5way"
-        "openssl/Interoperability/tls-1-3-interoperability-gnutls-openssl-p256"
-        "openssl/Interoperability/tls-1-3-interoperability-gnutls-openssl-p384"
-        "openssl/Interoperability/tls-1-3-interoperability-gnutls-openssl-p521"
-        "openssl/Interoperability/tls-1-3-interoperability-gnutls-openssl-rsae"
-        "openssl/Interoperability/tls-1-3-interoperability-gnutls-openssl-rsapss"
         "gnutls/Interoperability/TLSv1-2-with-OpenSSL"
         "openssl/Interoperability/CC-openssl-with-gnutls"
         "gnutls/Interoperability/certificates-with-OpenSSL"
