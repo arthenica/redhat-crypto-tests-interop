@@ -24,6 +24,7 @@ tag:
   - Tier3
   - Tier3security
   - TierCandidatesPASS
+  - interop
   - interop-openssl
   - interop-gnutls
   - interop-other

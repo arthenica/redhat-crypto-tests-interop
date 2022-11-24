@@ -18,6 +18,7 @@ tag:
   - results-yesterday-stable
   - rhel8-buildroot
   - rhel9-buildroot
+  - interop
   - interop-gnutls
   - interop-openssl
   - interop-other

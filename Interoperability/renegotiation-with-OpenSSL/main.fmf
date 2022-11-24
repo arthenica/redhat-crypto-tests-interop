@@ -20,6 +20,7 @@ tag:
   - Tier1
   - Tier1security
   - results-yesterday-stable
+  - interop
   - interop-gnutls
   - interop-openssl
   - interop-other
