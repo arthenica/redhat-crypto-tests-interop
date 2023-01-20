@@ -1,0 +1,55 @@
+summary: Verify interoperability of GnuTLS TLSv1.2 with NSS
+description: |
+    Test case requires new enough NSS, that means RHEL-6.7.z
+contact: Hubert  Kario <hkario@redhat.com>
+component:
+  - nss
+  - gnutls
+test: ./runtest.sh
+framework: beakerlib
+require:
+recommend:
+  - expect
+  - gnutls
+  - gnutls-utils
+  - nss
+  - nss-tools
+  - openssl
+  - crypto-policies
+  - crypto-policies-scripts
+duration: 3h
+enabled: true
+tag:
+  - NoRHEL4
+  - NoRHEL5
+  - Tier2
+  - Tier2security
+  - results-yesterday-stable
+  - interop
+  - interop-gnutls
+  - interop-nss
+  - interop-other
+tier: '2'
+link:
+  - relates: https://bugzilla.redhat.com/show_bug.cgi?id=1323215
+  - relates: https://bugzilla.redhat.com/show_bug.cgi?id=1321112
+  - relates: https://bugzilla.redhat.com/show_bug.cgi?id=1581717
+  - relates: https://bugzilla.redhat.com/show_bug.cgi?id=1613952
+  - relates: https://bugzilla.redhat.com/show_bug.cgi?id=1640611
+  - relates: https://bugzilla.redhat.com/show_bug.cgi?id=1713187
+  - relates: https://bugzilla.redhat.com/show_bug.cgi?id=1908334
+  - relates: https://bugzilla.redhat.com/show_bug.cgi?id=1644850
+adjust:
+  - enabled: false
+    when: distro == rhel-4, rhel-5
+    continue: false
+  - enabled: false
+    when: distro ~< rhel-6.7
+    continue: false
+  - because: never seen working on 7.2
+    enabled: false
+    when: distro == rhel-7 and distro ~<= rhel-7.2
+    continue: false
+extra-nitrate: TC#0521653
+extra-summary: /CoreOS/gnutls/Interoperability/TLSv1-2-with-NSS
+extra-task: /CoreOS/gnutls/Interoperability/TLSv1-2-with-NSS

@@ -45,6 +45,9 @@ TESTS=(
         "gnutls/Interoperability/softhsm-integration"
         # tests: nss <-> gnutls (TODO)
         "gnutls/Interoperability/tls-1-3-interoperability-gnutls-nss-2way"
+        "gnutls/Interoperability/tls-1-3-interoperability-gnutls-nss-3way"
+        "gnutls/Interoperability/TLSv1-2-with-NSS"
+	"gnutls/Interoperability/renegotiation-with-NSS"
         # tests: nss <-> openssl (TODO)
 )
 
