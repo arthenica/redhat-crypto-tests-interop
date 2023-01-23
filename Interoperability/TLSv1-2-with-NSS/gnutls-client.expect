@@ -1,0 +1,22 @@
+#!/usr/bin/expect
+set timeout 10
+spawn /bin/sh -c "$argv"
+expect {
+    "Handshake was completed" { }
+    default { exit 10 }
+}
+expect {
+    "Simple Client Mode:\r" {
+        send "GET / HTTP/1.0\r\r";
+    }
+    default { exit 11 }
+}
+expect {
+    "Generic Web Server" {
+            close
+    }
+    default { exit 12 }
+}
+set info [wait]
+#puts "Return from wait: $info"
+exit [lindex $info 3]

@@ -1,0 +1,42 @@
+summary: Test renegotiating the connection with NSS
+description: ''
+contact: Hubert  Kario <hkario@redhat.com>
+component:
+  - nss
+  - gnutls
+test: ./runtest.sh
+framework: beakerlib
+recommend:
+  - gnutls
+  - gnutls-utils
+  - nss
+  - nss-tools
+  - expect
+  - openssl
+  - crypto-policies-scripts
+duration: 10m
+enabled: true
+tag:
+  - NoRHEL4
+  - NoRHEL5
+  - Tier2
+  - Tier2security
+  - results-yesterday-stable
+  - interop
+  - interop-gnutls
+  - interop-nss
+  - interop-other
+tier: '2'
+link:
+  - relates: https://bugzilla.redhat.com/show_bug.cgi?id=1644850
+adjust:
+  - enabled: false
+    when: distro == rhel-4, rhel-5
+    continue: false
+  - because: never seen working on 7.2
+    enabled: false
+    when: distro == rhel-7 and distro ~<= rhel-7.2
+    continue: false
+extra-nitrate: TC#0525742
+extra-summary: /CoreOS/gnutls/Interoperability/renegotiation-with-NSS
+extra-task: /CoreOS/gnutls/Interoperability/renegotiation-with-NSS
