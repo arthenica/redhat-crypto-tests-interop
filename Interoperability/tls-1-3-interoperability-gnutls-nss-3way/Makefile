@@ -58,7 +58,7 @@ $(METADATA): Makefile
 	@echo "Path:            $(TEST_DIR)" >> $(METADATA)
 	@echo "Description:     Test TLS 1.3 interoperability between NSS and GnuTLS" >> $(METADATA)
 	@echo "Type:            Interoperability" >> $(METADATA)
-	@echo "TestTime:        2h" >> $(METADATA)
+	@echo "TestTime:        3h" >> $(METADATA)
 	@echo "RunFor:          gnutls nss" >> $(METADATA)
 	@echo "Requires:        expect gnutls gnutls-utils nss nss-tools openssl" >> $(METADATA)
 	@echo "Priority:        Normal" >> $(METADATA)

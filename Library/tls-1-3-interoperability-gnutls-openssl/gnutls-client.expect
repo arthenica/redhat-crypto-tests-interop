@@ -3,6 +3,11 @@ set timeout 30
 spawn /bin/sh -c "$argv"
 expect {
     "Handshake was completed" {
+        expect {
+            "Simple Client Mode:" { }
+            eof { exit 13 }
+            timeout { exit 14 }
+        }
         if [string match {*--inline-commands*} $argv] {
             send "^rekey^\r"
             expect {

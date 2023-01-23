@@ -93,7 +93,7 @@ rlJournalStart
             if ( ! rlIsRHEL "<8" && [[ $fips -eq 0 ]] ) || ! rlIsRHEL '<9'; then
                 [[ "$sett" =~ "-tls1_1" ]] && continue
             fi
-            rlRun -s "(sleep 0.5; echo R; sleep 0.5; echo Q) | openssl s_client -connect localhost:4433 -CAfile localhost.crt $sett"
+            rlRun -s "(sleep 1; echo R; sleep 1; echo Q) | openssl s_client -connect localhost:4433 -CAfile localhost.crt $sett"
             rlAssertGrep "RENEGOTIATING" $rlRun_LOG
             rlRun "grep -A 10 RENEGOTIATING $rlRun_LOG | grep 'verify return:1'"
         done
