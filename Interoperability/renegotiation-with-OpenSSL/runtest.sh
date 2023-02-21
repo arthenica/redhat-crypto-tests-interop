@@ -55,7 +55,7 @@ rlJournalStart
     rlPhaseEnd
 
     rlPhaseStartTest "openssl server"
-        if rlIsRHEL && ! rlIsRHEL '<9' || rlIsFedora && ! rlIsFedora '<36'; then
+        if ! (rlIsRHEL '<9' || rlIsCentOS '<9' || rlIsFedora '<36'); then
             # openssl 3.0 change, client renegotiation is disabled by default
             # https://github.com/openssl/openssl/commit/55373bfd419ca010a15aac18c88c94827e2f3a92
             openssl_server_opts+=" -client_renegotiation"
