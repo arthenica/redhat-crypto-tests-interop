@@ -36,8 +36,8 @@ TESTS=(
         # tests: openssl <-> gnutls
         "openssl/Interoperability/tls-1-3-interoperability-gnutls-openssl-2way"
         "openssl/Interoperability/tls-1-3-interoperability-gnutls-openssl-3way"
-        "gnutls/Interoperability/TLSv1-2-with-OpenSSL"
         "openssl/Interoperability/CC-openssl-with-gnutls"
+        "gnutls/Interoperability/TLSv1-2-with-OpenSSL"
         "gnutls/Interoperability/certificates-with-OpenSSL"
         "gnutls/Interoperability/keymatexport-with-OpenSSL"
         "gnutls/Interoperability/renegotiation-with-OpenSSL"
@@ -65,7 +65,15 @@ for t in ${TESTS[@]}; do
 
     sdir="$source_root/$t"
     debug "Source dir: $sdir"
-    ddir="$dest_root/${t#*/}"
+    if [[ "$t" != *"/Library/"* ]]; then
+        parent=${t%%/*}
+        debug "Parent repo: $parent"
+        testname=${t##*/}
+        debug "Test name: $testname"
+        ddir="$dest_root/Interoperability/${parent}_$testname"
+    else
+        ddir="$dest_root/${t#*/}"
+    fi
     debug "Dest dir: $ddir"
     mkdir -p $ddir
     debug "$sdir -> $ddir"
