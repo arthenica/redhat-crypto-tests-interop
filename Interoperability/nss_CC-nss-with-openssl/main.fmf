@@ -27,6 +27,7 @@ tag:
   - interop
   - interop-nss
   - interop-openssl
+  - interop-nss-fast
 tier: '3'
 link:
   - relates: https://bugzilla.redhat.com/show_bug.cgi?id=1008542
