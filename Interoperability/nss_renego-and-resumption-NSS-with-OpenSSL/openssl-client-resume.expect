@@ -1,0 +1,22 @@
+#!/usr/bin/expect
+set timeout 30
+eval spawn $argv
+# session ticket can be large so allow large buffers
+match_max 20000
+expect {
+    "SSL-Session:*Verify return code: 0 *---" {
+    }
+    eof { exit 7 }
+    timeout { close; exit 8 }
+}
+expect {
+    -timeout 1
+    "\r" { }
+    eof { exit 9 }
+    timeout { }
+}
+send "client hello\r"
+sleep 1
+close
+set info [wait]
+exit [lindex $info 3]

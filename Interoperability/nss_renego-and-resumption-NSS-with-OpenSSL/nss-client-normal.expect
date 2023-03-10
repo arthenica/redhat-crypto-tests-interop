@@ -1,0 +1,21 @@
+#!/usr/bin/expect
+set timeout 30
+eval spawn $argv
+expect {
+    "Enter Password" { send "RedHatEnterpriseLinux6.6\r"; exp_continue }
+    eof { exit 7 }
+    timeout { close; exit 8 }
+    "subject DN*Received 0 Cert Status items (OCSP stapled data)" {
+        send "GET / HTTP/1.0\r\r";
+    }
+}
+expect {
+    -re "</HTML>|</html>" {
+        close;
+    }
+    eof { exit 9 }
+    timeout { close; exit 10 }
+}
+set info [wait]
+#puts "Return from wait: $info"
+exit [lindex $info 3]

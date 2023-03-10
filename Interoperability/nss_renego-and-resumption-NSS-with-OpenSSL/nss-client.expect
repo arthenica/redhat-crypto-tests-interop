@@ -1,0 +1,33 @@
+#!/usr/bin/expect
+set timeout 30
+eval spawn $argv
+match_max 20000
+expect {
+    "Enter Password" { send "RedHatEnterpriseLinux6.6\r"; exp_continue }
+    eof { exit 6 }
+    timeout { exit 7 }
+    "subject DN" { }
+}
+expect {
+    "subject DN" { }
+    eof { exit 8 }
+    timeout { exit 9 }
+}
+expect {
+    -timeout 2
+    "\r" { }
+    timeout { }
+    eof { exit 10 }
+}
+send "GET / HTTP/1.0\r\r"
+expect {
+    -timeout 5
+    "Verify return code" { exp_continue }
+    "</HTML>" { close }
+    "</html>" { close }
+    eof { exit 11 }
+    timeout { exit 12 }
+}
+set info [wait]
+#puts "Return from wait: $info"
+exit [lindex $info 3]

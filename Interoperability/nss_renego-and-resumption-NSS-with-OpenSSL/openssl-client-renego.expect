@@ -1,0 +1,34 @@
+#!/usr/bin/expect
+set timeout 30
+eval spawn $argv
+match_max 20000
+expect {
+    "SSL-Session:*Verify return code: 0 *---" { }
+    eof { exit 7 }
+    timeout { close; exit 8 }
+}
+expect {
+    -timeout 2
+    "\r" { }
+    eof { exit 13 }
+    timeout { }
+}
+send "R\r"
+expect {
+    "RENEGOTIATING*depth=0*verify return:1" {
+        # allow openssl to print the newline, but continue even without it
+        sleep 0.1
+        send "GET / HTTP/1.0\r\r"
+    }
+    eof { exit 9 }
+    timeout { close; exit 10 }
+}
+expect {
+    "HTTP/1.0 200 OK*EOF" {
+        close
+    }
+    eof { exit 11 }
+    timeout { close; exit 12 }
+}
+set info [wait]
+exit [lindex $info 3]

@@ -1,0 +1,52 @@
+summary: Verify that renegotiation and resumption between NSS and OpenSSL works
+description: ''
+contact: Hubert  Kario <hkario@redhat.com>
+component:
+  - nss
+  - openssl
+test: ./runtest.sh
+framework: beakerlib
+require:
+recommend:
+  - nss
+  - nss-tools
+  - openssl
+  - expect
+duration: 6h
+enabled: true
+tag:
+  - FedoraBroken
+  - NoRHEL4
+  - NoRHEL5
+  - NoTier
+  - TIPpass_Security
+  - very_slow
+  - interop
+  - interop-nss
+  - interop-openssl
+link:
+  - relates: https://bugzilla.redhat.com/show_bug.cgi?id=1397482
+  - relates: https://bugzilla.redhat.com/show_bug.cgi?id=1397410
+  - relates: https://bugzilla.redhat.com/show_bug.cgi?id=1397486
+  - relates: https://bugzilla.redhat.com/show_bug.cgi?id=1397472
+  - relates: https://bugzilla.redhat.com/show_bug.cgi?id=1397478
+  - relates: https://bugzilla.redhat.com/show_bug.cgi?id=1397365
+  - relates: https://bugzilla.redhat.com/show_bug.cgi?id=1640611
+  - relates: https://bugzilla.redhat.com/show_bug.cgi?id=1455876
+  - relates: https://bugzilla.redhat.com/show_bug.cgi?id=1426182
+  - relates: https://bugzilla.redhat.com/show_bug.cgi?id=1713187
+  - relates: https://bugzilla.redhat.com/show_bug.cgi?id=1671095
+  - relates: https://bugzilla.redhat.com/show_bug.cgi?id=1457789
+adjust:
+  - enabled: false
+    when: distro == rhel-4, rhel-5
+    continue: false
+  - enabled: false
+    when: distro ~< rhel-6.5
+    continue: false
+  - enabled: false
+    when: distro ~< rhel-7.5
+    continue: false
+extra-nitrate: TC#0521774
+extra-summary: /CoreOS/nss/Interoperability/renego-and-resumption-NSS-with-OpenSSL
+extra-task: /CoreOS/nss/Interoperability/renego-and-resumption-NSS-with-OpenSSL

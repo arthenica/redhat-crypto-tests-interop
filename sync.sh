@@ -49,6 +49,9 @@ TESTS=(
         "gnutls/Interoperability/TLSv1-2-with-NSS"
 	"gnutls/Interoperability/renegotiation-with-NSS"
         # tests: nss <-> openssl (TODO)
+        "openssl/Interoperability/tls-1-3-interoperability-nss-openssl-2way"
+        "nss/Interoperability/renego-and-resumption-NSS-with-OpenSSL"
+        "nss/Interoperability/CC-nss-with-openssl"
 )
 
 EXCLUDED_FILES=(

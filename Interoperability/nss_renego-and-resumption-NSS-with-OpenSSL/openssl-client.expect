@@ -1,0 +1,19 @@
+#!/usr/bin/expect
+set timeout 30
+eval spawn $argv
+expect {
+    "SSL-Session:*Verify return code: 0 *---\r" {
+        send "GET / HTTP/1.0\r\r"
+    }
+    eof { exit 7 }
+    timeout { close; exit 8 }
+}
+expect {
+    "Server: Generic Web Server*EOF" {
+        close
+    }
+    eof { exit 9 }
+    timeout { close; exit 10 }
+}
+set info [wait]
+exit [lindex $info 3]
