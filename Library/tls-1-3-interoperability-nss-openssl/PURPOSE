@@ -1,0 +1,3 @@
+PURPOSE of /CoreOS/openssl/Library/tls-1-3-interoperability-nss-openssl
+Description: Test TLS 1.3 interoperability between NSS and OpenSSL
+Author: Hubert Kario <hkario@redhat.com>

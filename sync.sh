@@ -32,6 +32,7 @@ TESTS=(
         "distribution/Library/fips"
         "openssl/Library/certgen"
         "openssl/Library/tls-1-3-interoperability-gnutls-openssl"
+        "openssl/Library/tls-1-3-interoperability-nss-openssl"
         "gnutls/Library/tls-1-3-interoperability-gnutls-nss/"
         # tests: openssl <-> gnutls
         "openssl/Interoperability/tls-1-3-interoperability-gnutls-openssl-2way"

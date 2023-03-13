@@ -1,0 +1,42 @@
+summary: Test TLS 1.3 interoperability between NSS and OpenSSL (shared code library)
+description: ''
+contact: Alexander Sosedkin <asosedki@redhat.com>
+component:
+  - nss
+  - openssl
+test: ./runtest.sh
+framework: beakerlib
+require:
+  - expect
+  - nss
+  - nss-tools
+  - openssl
+  - tcpdump
+duration: 15m
+enabled: true
+tag:
+  - NoRHEL4
+  - NoRHEL5
+  - NoRHEL6
+  - NoRHEL7
+  - Tier2
+tier: '2'
+link:
+  - relates: https://bugzilla.redhat.com/show_bug.cgi?id=1724250
+  - relates: https://bugzilla.redhat.com/show_bug.cgi?id=1731182
+  - relates: https://bugzilla.redhat.com/show_bug.cgi?id=1952615
+adjust:
+  - because: OpenSSL doesn't support TLS 1.3 on RHEL-7 and earlier
+    enabled: false
+    when: distro < rhel-8
+    continue: false
+  - enabled: false
+    when: distro == rhel-alt
+    continue: false
+  - because: but has planned addition in 8.2.z
+    enabled: false
+    when: distro ~<= rhel-8.1 and fips is defined
+    continue: false
+extra-nitrate: TC#0602841
+extra-summary: /CoreOS/openssl/Library/tls-1-3-interoperability-nss-openssl
+extra-task: /CoreOS/openssl/Library/tls-1-3-interoperability-nss-openssl

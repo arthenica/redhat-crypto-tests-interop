@@ -1,0 +1,19 @@
+#!/usr/bin/expect
+set timeout 30
+eval spawn $argv
+expect {
+    "Verify return code: 0*---" {
+        send "GET / HTTP/1.0\r\r";
+        expect {
+            "HTTP/1.0 200*EOF" {
+                    close
+            }
+            eof { exit 9 }
+            timeout { exit 10 }
+        }
+    }
+    eof { exit 7 }
+    timeout { close; exit 8 }
+}
+set info [wait]
+exit [lindex $info 3]
