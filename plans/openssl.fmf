@@ -1,0 +1,6 @@
+summary: Upstream interoperability openssl
+discover:
+    how: fmf
+    filter: 'tag: interop-openssl'
+execute:
+    how: tmt
