@@ -2,7 +2,15 @@
 set timeout 30
 eval spawn $argv
 expect {
-    "SSL-Session:*Verify return code: 0 *---\r" {
+    "SSL-Session:*Verify return code: 0 *---" {
+        # make "\r" after --- optional,
+        # but still wait a bit to avoid it splitting our GET request
+        expect {
+            -timeout 2
+            "\r" { }
+            timeout { }
+            eof { exit 11 }
+        }
         send "GET / HTTP/1.0\r\r"
     }
     eof { exit 7 }

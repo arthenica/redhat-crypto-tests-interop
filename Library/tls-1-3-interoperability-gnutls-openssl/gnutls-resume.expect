@@ -2,26 +2,31 @@
 set timeout 30
 spawn /bin/sh -c "$argv"
 expect {
-    "Resume Handshake was completed" {
-        if [string match {*--inline-commands*} $argv] {
-            send "^rekey^\r"
-            expect {
-                "Rekey was completed" { }
-                eof { exit 11 }
-                timeout { exit 12 }
-            }
-        }
-        send "GET / HTTP/1.0\r\r";
-        expect {
-            "</HTML>" {
-                    close
-            }
-            eof { exit 9 }
-            timeout { exit 10 }
-        }
-    }
+    "Resume Handshake was completed" { }
     eof { exit 7 }
     timeout { close; exit 8 }
+}
+expect {
+    -timeout 1
+    "Simple Client Mode:\r" { }
+    eof { exit 13 }
+    timeout { }
+}
+if [string match {*--inline-commands*} $argv] {
+    send "^rekey^\r"
+    expect {
+        "Rekey was completed" { }
+        eof { exit 11 }
+        timeout { exit 12 }
+    }
+}
+send "GET / HTTP/1.0\r\r";
+expect {
+    "</HTML>" {
+            close
+    }
+    eof { exit 9 }
+    timeout { exit 10 }
 }
 set info [wait]
 exit [lindex $info 3]

@@ -7,7 +7,6 @@ component:
   - gnutls
 test: ./runtest.sh
 framework: beakerlib
-require:
 recommend:
   - gnutls
   - openssl

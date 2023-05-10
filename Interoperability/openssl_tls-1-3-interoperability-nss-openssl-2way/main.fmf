@@ -6,13 +6,12 @@ component:
   - openssl
 test: ./runtest.sh
 framework: beakerlib
-require:
 recommend:
   - expect
   - nss
   - nss-tools
   - openssl
-duration: 60m
+duration: 2h
 enabled: true
 tag:
   - NoRHEL4
@@ -24,7 +23,8 @@ tag:
   - interop-openssl
   - interop-nss
   - interop-2way
-  - interop-nss-slow
+  - interop-slow
+  - interop-parallel-2
 tier: '3'
 link:
   - relates: https://bugzilla.redhat.com/show_bug.cgi?id=1935040

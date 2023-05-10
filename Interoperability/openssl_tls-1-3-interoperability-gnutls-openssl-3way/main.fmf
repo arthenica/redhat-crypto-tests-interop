@@ -6,7 +6,6 @@ component:
   - gnutls
 test: ./runtest.sh
 framework: beakerlib
-require:
 recommend:
   - expect
   - gnutls
@@ -25,6 +24,8 @@ tag:
   - interop-gnutls
   - interop-openssl
   - interop-3way
+  - interop-slow
+  - interop-parallel-3
 link:
   - relates: https://bugzilla.redhat.com/show_bug.cgi?id=1677754
   - relates: https://bugzilla.redhat.com/show_bug.cgi?id=1983676

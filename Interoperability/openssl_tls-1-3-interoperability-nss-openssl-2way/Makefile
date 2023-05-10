@@ -58,7 +58,7 @@ $(METADATA): Makefile
 	@echo "Path:            $(TEST_DIR)" >> $(METADATA)
 	@echo "Description:     Test TLS 1.3 interoperability between NSS and OpenSSL" >> $(METADATA)
 	@echo "Type:            Interoperability" >> $(METADATA)
-	@echo "TestTime:        60m" >> $(METADATA)
+	@echo "TestTime:        2h" >> $(METADATA)
 	@echo "RunFor:          nss openssl" >> $(METADATA)
 	@echo "Requires:        expect nss nss-tools openssl" >> $(METADATA)
 	@echo "Priority:        Normal" >> $(METADATA)

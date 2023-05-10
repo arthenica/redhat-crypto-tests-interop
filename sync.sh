@@ -112,6 +112,10 @@ for t in ${TESTS[@]}; do
     if [[ -r $source_root/$t/main.fmf ]]; then
         sed -i "/[ ]*-[ ]*library[ ]*([^)]*)/d" $ddir/main.fmf # remove libs from long lists
         sed -i "s/library[ ]*([^)]*)[ ,]*//g" $ddir/main.fmf # remove libs from short lists
+
+        # ugly hack to remove empty "require"s
+        cat $ddir/main.fmf |awk '/^require:$/ { req=1; next } /^recommend:$/ { if (req) { req=0; print; next } } { if (req) { req=0; print "require:"; } print }' >$ddir/main.fmf.new
+        mv $ddir/main.fmf.new $ddir/main.fmf
     fi
     if [[ $scriptfile = "runtest.sh" && -r $ddir/main.fmf ]]; then
         grep -qw interop $ddir/main.fmf || fail "no 'interop' tag"

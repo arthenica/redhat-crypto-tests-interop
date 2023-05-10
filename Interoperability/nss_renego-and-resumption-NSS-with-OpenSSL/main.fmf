@@ -6,7 +6,6 @@ component:
   - openssl
 test: ./runtest.sh
 framework: beakerlib
-require:
 recommend:
   - nss
   - nss-tools
@@ -24,7 +23,8 @@ tag:
   - interop
   - interop-nss
   - interop-openssl
-  - interop-nss-slow
+  - interop-slow
+  - interop-parallel-1
 link:
   - relates: https://bugzilla.redhat.com/show_bug.cgi?id=1397482
   - relates: https://bugzilla.redhat.com/show_bug.cgi?id=1397410

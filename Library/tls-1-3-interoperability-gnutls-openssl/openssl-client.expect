@@ -1,6 +1,7 @@
 #!/usr/bin/expect
 set timeout 30
 spawn /bin/sh -c "$argv"
+match_max 20000
 expect {
     "Verify return code: 0" { }
     eof { exit 7 }
