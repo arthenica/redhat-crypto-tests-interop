@@ -24,7 +24,6 @@ tag:
   - interop-nss
   - interop-2way
   - interop-slow
-  - interop-parallel-2
 tier: '3'
 link:
   - relates: https://bugzilla.redhat.com/show_bug.cgi?id=1935040

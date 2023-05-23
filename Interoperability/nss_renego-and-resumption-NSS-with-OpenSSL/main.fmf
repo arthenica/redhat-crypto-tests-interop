@@ -24,7 +24,7 @@ tag:
   - interop-nss
   - interop-openssl
   - interop-slow
-  - interop-parallel-1
+  - interop-reneg
 link:
   - relates: https://bugzilla.redhat.com/show_bug.cgi?id=1397482
   - relates: https://bugzilla.redhat.com/show_bug.cgi?id=1397410
