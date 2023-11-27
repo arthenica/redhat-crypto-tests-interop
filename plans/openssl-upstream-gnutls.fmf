@@ -1,0 +1,7 @@
+summary: Upstream TLS interoperability OpenSSL - GnuTLS
+discover:
+    name: interop-gnutls
+    how: fmf
+    filter: 'tag: interop-openssl & tag: interop-gnutls & tag: -interop-slow'
+execute:
+    how: tmt
