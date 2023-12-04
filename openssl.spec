@@ -88,6 +88,8 @@ package provides Perl scripts for converting certificates and keys
 from other formats to the formats used by the OpenSSL toolkit.
 
 %prep
+echo "Sources unpacked to BUILD dir manually"
+%setup -n %{name}-%{version}
 
 %build
 # Figure out which flags we want to use.
@@ -166,10 +168,7 @@ export HASHBANGPERL=/usr/bin/perl
 # Configure the build tree.  Override OpenSSL defaults with known-good defaults
 # usable on all platforms.  The Configure script already knows to use -fPIC and
 # RPM_OPT_FLAGS, so we can skip specifiying them here.
-pwd
-echo CD
-cd openssl-%{version}
-pwd
+#cd openssl-%{version}
 ./Configure \
 	--prefix=%{_prefix} --openssldir=%{_sysconfdir}/pki/tls ${sslflags} \
 	zlib enable-camellia enable-seed enable-rfc3779 enable-sctp \
@@ -190,21 +189,49 @@ for i in libcrypto.pc libssl.pc openssl.pc ; do
 done
 
 %check
+echo CHECK
+pwd
+#cd openssl-%{version}
 # Verify that what was compiled actually works.
+
+# Hack - either enable SCTP AUTH chunks in kernel or disable sctp for check
+(sysctl net.sctp.addip_enable=1 && sysctl net.sctp.auth_enable=1) || \
+(echo 'Failed to enable SCTP AUTH chunks, disabling SCTP for tests...' &&
+ sed '/"msan" => "default",/a\ \ "sctp" => "default",' configdata.pm > configdata.pm.new && \
+ touch -r configdata.pm configdata.pm.new && \
+ mv -f configdata.pm.new configdata.pm)
+
+# We must revert patch4 before tests otherwise they will fail
+#patch -p1 -R < %{PATCH4}
+#We must disable default provider before tests otherwise they will fail
+#patch -p1 < %{SOURCE14}
+
+OPENSSL_ENABLE_MD5_VERIFY=
+export OPENSSL_ENABLE_MD5_VERIFY
+%if 0%{?rhel}
+OPENSSL_ENABLE_SHA1_SIGNATURES=
+export OPENSSL_ENABLE_SHA1_SIGNATURES
+%endif
+OPENSSL_SYSTEM_CIPHERS_OVERRIDE=xyz_nonexistent_file
+export OPENSSL_SYSTEM_CIPHERS_OVERRIDE
+#embed HMAC into fips provider for test run
+OPENSSL_CONF=/dev/null LD_LIBRARY_PATH=. apps/openssl dgst -binary -sha256 -mac HMAC -macopt hexkey:f4556650ac31d35461610bac4ed81b1a181b2d8a43ea2854cbae22ca74560813 < providers/fips.so > providers/fips.so.hmac
+#objcopy --update-section .rodata1=providers/fips.so.hmac providers/fips.so providers/fips.so.mac
+#mv providers/fips.so.mac providers/fips.so
 echo "No tests for interop CI"
 
 # Add generation of HMAC checksum of the final stripped library
 # We manually copy standard definition of __spec_install_post
 # and add hmac calculation/embedding to fips.so
-%define __spec_install_post \
-    %{?__debug_package:%{__debug_install_post}} \
-    %{__arch_install_post} \
-    %{__os_install_post} \
-    OPENSSL_CONF=/dev/null LD_LIBRARY_PATH=. apps/openssl dgst -binary -sha256 -mac HMAC -macopt hexkey:f4556650ac31d35461610bac4ed81b1a181b2d8a43ea2854cbae22ca74560813 < $RPM_BUILD_ROOT%{_libdir}/ossl-modules/fips.so > $RPM_BUILD_ROOT%{_libdir}/ossl-modules/fips.so.hmac \
-    objcopy --update-section .rodata1=$RPM_BUILD_ROOT%{_libdir}/ossl-modules/fips.so.hmac $RPM_BUILD_ROOT%{_libdir}/ossl-modules/fips.so $RPM_BUILD_ROOT%{_libdir}/ossl-modules/fips.so.mac \
-    mv $RPM_BUILD_ROOT%{_libdir}/ossl-modules/fips.so.mac $RPM_BUILD_ROOT%{_libdir}/ossl-modules/fips.so \
-    rm $RPM_BUILD_ROOT%{_libdir}/ossl-modules/fips.so.hmac \
-%{nil}
+#%define __spec_install_post \
+#    %{?__debug_package:%{__debug_install_post}} \
+#    %{__arch_install_post} \
+#    %{__os_install_post} \
+#    OPENSSL_CONF=/dev/null LD_LIBRARY_PATH=. apps/openssl dgst -binary -sha256 -mac HMAC -macopt hexkey:f4556650ac31d35461610bac4ed81b1a181b2d8a43ea2854cbae22ca74560813 < $RPM_BUILD_ROOT%{_libdir}/ossl-modules/fips.so > $RPM_BUILD_ROOT%{_libdir}/ossl-modules/fips.so.hmac \
+#    objcopy --update-section .rodata1=$RPM_BUILD_ROOT%{_libdir}/ossl-modules/fips.so.hmac $RPM_BUILD_ROOT%{_libdir}/ossl-modules/fips.so $RPM_BUILD_ROOT%{_libdir}/ossl-modules/fips.so.mac \
+#    mv $RPM_BUILD_ROOT%{_libdir}/ossl-modules/fips.so.mac $RPM_BUILD_ROOT%{_libdir}/ossl-modules/fips.so \
+#    rm $RPM_BUILD_ROOT%{_libdir}/ossl-modules/fips.so.hmac \
+#%{nil}
 
 %define __provides_exclude_from %{_libdir}/openssl
 
@@ -213,7 +240,10 @@ echo "No tests for interop CI"
 # Install OpenSSL.
 install -d $RPM_BUILD_ROOT{%{_bindir},%{_includedir},%{_libdir},%{_mandir},%{_libdir}/openssl,%{_pkgdocdir}}
 
+#cd openssl-%{version}
 %{__make} install_sw DESTDIR=%{?buildroot} INSTALL="%{__install} -p"
+%{__make} install_ssldirs DESTDIR=%{?buildroot} INSTALL="%{__install} -p"
+%{__make} install_fips DESTDIR=%{?buildroot} INSTALL="%{__install} -p"
 
 rename so.%{soversion} so.%{version} $RPM_BUILD_ROOT%{_libdir}/*.so.%{soversion}
 for lib in $RPM_BUILD_ROOT%{_libdir}/*.so.%{version} ; do
@@ -235,26 +265,19 @@ mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/certs
 mv $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/misc/*.pl $RPM_BUILD_ROOT%{_bindir}
 mv $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/misc/tsget $RPM_BUILD_ROOT%{_bindir}
 
-# Rename man pages so that they don't conflict with other system man pages.
-pushd $RPM_BUILD_ROOT%{_mandir}
-mv man5/config.5ossl man5/openssl.cnf.5
-popd
-
 mkdir -m755 $RPM_BUILD_ROOT%{_sysconfdir}/pki/CA
 mkdir -m700 $RPM_BUILD_ROOT%{_sysconfdir}/pki/CA/private
 mkdir -m755 $RPM_BUILD_ROOT%{_sysconfdir}/pki/CA/certs
 mkdir -m755 $RPM_BUILD_ROOT%{_sysconfdir}/pki/CA/crl
 mkdir -m755 $RPM_BUILD_ROOT%{_sysconfdir}/pki/CA/newcerts
 
-# Ensure the config file timestamps are identical across builds to avoid
-# mulitlib conflicts and unnecessary renames on upgrade
-touch -r %{SOURCE2} $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/openssl.cnf
-touch -r %{SOURCE2} $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/ct_log_list.cnf
-
 rm -f $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/openssl.cnf.dist
 rm -f $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/ct_log_list.cnf.dist
 #we don't use native fipsmodule.cnf because FIPS module is loaded automatically
 rm -f $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/fipsmodule.cnf
+
+rm -f $RPM_BUILD_ROOT%{_libdir}/cmake/OpenSSL/OpenSSLConfig.cmake
+rm -f $RPM_BUILD_ROOT%{_libdir}/cmake/OpenSSL/OpenSSLConfigVersion.cmake
 
 # Determine which arch opensslconf.h is going to try to #include.
 basearch=%{_arch}
@@ -279,12 +302,8 @@ sed -i '/^\#ifndef OPENSSL_NO_SSL_TRACE/i\
 # Do an configuration.h switcheroo to avoid file conflicts on systems where you
 # can have both a 32- and 64-bit version of the library, and they each need
 # their own correct-but-different versions of opensslconf.h to be usable.
-install -m644 %{SOURCE10} \
-	$RPM_BUILD_ROOT/%{_prefix}/include/openssl/configuration-${basearch}.h
 cat $RPM_BUILD_ROOT/%{_prefix}/include/openssl/configuration.h >> \
 	$RPM_BUILD_ROOT/%{_prefix}/include/openssl/configuration-${basearch}.h
-install -m644 %{SOURCE9} \
-	$RPM_BUILD_ROOT/%{_prefix}/include/openssl/configuration.h
 %endif
 
 %files
