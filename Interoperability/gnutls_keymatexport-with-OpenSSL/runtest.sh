@@ -76,7 +76,7 @@ rlJournalStart
         declare -a C_OSSLPROTO
 
 
-        if [[ $fips -ne 0 ]] && (rlIsRHEL '<9' || rlIsFedora); then
+        if [[ $fips -ne 0 ]] && (rlIsRHEL '<9' || rlIsFedora '<39'); then
             C_TEST[$i]="TLS-1.1 SHA1-MD5 PRF"
             C_PRIO[$i]="NONE:+VERS-TLS1.1:+AES-256-CBC:+SHA1:+RSA:+SIGN-ALL"
             C_OPENSSL[$i]="AES256-SHA"

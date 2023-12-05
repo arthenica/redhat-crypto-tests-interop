@@ -451,7 +451,7 @@ rlJournalStart
         if [[ $fips -eq 0 ]] && ! rlIsRHEL '<8'; then
             protos=(tls1_2)
         # On 9 tls1.1 is not allowed, but it's still allowed in Fedora
-        elif rlIsRHEL '<9' || rlIsFedora; then
+        elif rlIsRHEL '<9' || rlIsFedora '<39'; then
             protos=(tls1_2 tls1_1)
         else
             protos=(tls1_2)
