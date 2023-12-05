@@ -1,8 +1,5 @@
-# For the curious:
-# 0.9.8jk + EAP-FAST soversion = 8
-# 1.0.0 soversion = 10
-# 1.1.0 soversion = 1.1 (same as upstream although presence of some symbols
-#                        depends on build configuration options)
+# Butchered openssl.spec for compilation in fedora 39 container.
+
 # 3.0.0 soversion = 3 (same as upstream)
 %define soversion 3
 
@@ -220,19 +217,6 @@ OPENSSL_CONF=/dev/null LD_LIBRARY_PATH=. apps/openssl dgst -binary -sha256 -mac 
 #mv providers/fips.so.mac providers/fips.so
 echo "No tests for interop CI"
 
-# Add generation of HMAC checksum of the final stripped library
-# We manually copy standard definition of __spec_install_post
-# and add hmac calculation/embedding to fips.so
-#%define __spec_install_post \
-#    %{?__debug_package:%{__debug_install_post}} \
-#    %{__arch_install_post} \
-#    %{__os_install_post} \
-#    OPENSSL_CONF=/dev/null LD_LIBRARY_PATH=. apps/openssl dgst -binary -sha256 -mac HMAC -macopt hexkey:f4556650ac31d35461610bac4ed81b1a181b2d8a43ea2854cbae22ca74560813 < $RPM_BUILD_ROOT%{_libdir}/ossl-modules/fips.so > $RPM_BUILD_ROOT%{_libdir}/ossl-modules/fips.so.hmac \
-#    objcopy --update-section .rodata1=$RPM_BUILD_ROOT%{_libdir}/ossl-modules/fips.so.hmac $RPM_BUILD_ROOT%{_libdir}/ossl-modules/fips.so $RPM_BUILD_ROOT%{_libdir}/ossl-modules/fips.so.mac \
-#    mv $RPM_BUILD_ROOT%{_libdir}/ossl-modules/fips.so.mac $RPM_BUILD_ROOT%{_libdir}/ossl-modules/fips.so \
-#    rm $RPM_BUILD_ROOT%{_libdir}/ossl-modules/fips.so.hmac \
-#%{nil}
-
 %define __provides_exclude_from %{_libdir}/openssl
 
 %install
@@ -347,140 +331,6 @@ cat $RPM_BUILD_ROOT/%{_prefix}/include/openssl/configuration.h >> \
 %ldconfig_scriptlets libs
 
 %changelog
-* Thu Oct 26 2023 Sahana Prasad <sahana@redhat.com> - 1:3.1.4-1
-- Rebase to upstream version 3.1.4
-
-* Thu Oct 19 2023 Sahana Prasad <sahana@redhat.com> - 1:3.1.3-1
-- Rebase to upstream version 3.1.3
-
-* Thu Aug 31 2023 Dmitry Belyavskiy <dbelyavs@redhat.com> - 1:3.1.1-4
-- Drop duplicated patch and do some contamination
-
-* Tue Aug 22 2023 Dmitry Belyavskiy <dbelyavs@redhat.com> - 1:3.1.1-3
-- Integrate FIPS patches from CentOS
-
-* Fri Aug 04 2023 Dmitry Belyavskiy <dbelyavs@redhat.com> - 1:3.1.1-2
-- migrated to SPDX license
-
-* Thu Jul 27 2023 Sahana Prasad <sahana@redhat.com> - 1:3.1.1-1
-- Rebase to upstream version 3.1.1
-  Resolves: CVE-2023-0464
-  Resolves: CVE-2023-0465
-  Resolves: CVE-2023-0466
-  Resolves: CVE-2023-1255
-  Resolves: CVE-2023-2650
-
-* Thu Jul 27 2023 Dmitry Belyavskiy <dbelyavs@redhat.com> - 1:3.0.8-4
-- Forbid custom EC more completely
-  Resolves: rhbz#2223953
-
-* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1:3.0.8-3
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
-
-* Tue Mar 21 2023 Sahana Prasad <sahana@redhat.com> - 1:3.0.8-2
-- Upload new upstream sources without manually hobbling them.
-- Remove the hobbling script as it is redundant. It is now allowed to ship
-  the sources of patented EC curves, however it is still made unavailable to use
-  by compiling with the 'no-ec2m' Configure option. The additional forbidden
-  curves such as P-160, P-192, wap-tls curves are manually removed by updating
-  0011-Remove-EC-curves.patch.
-- Enable Brainpool curves.
-- Apply the changes to ec_curve.c and  ectest.c as a new patch
-  0010-Add-changes-to-ectest-and-eccurve.patch instead of replacing them.
-- Modify 0011-Remove-EC-curves.patch to allow Brainpool curves.
-- Modify 0011-Remove-EC-curves.patch to allow code under macro OPENSSL_NO_EC2M.
-  Resolves: rhbz#2130618, rhbz#2141672
-
-* Thu Feb 09 2023 Dmitry Belyavskiy <dbelyavs@redhat.com> - 1:3.0.8-1
-- Rebase to upstream version 3.0.8
-  Resolves: CVE-2022-4203
-  Resolves: CVE-2022-4304
-  Resolves: CVE-2022-4450
-  Resolves: CVE-2023-0215
-  Resolves: CVE-2023-0216
-  Resolves: CVE-2023-0217
-  Resolves: CVE-2023-0286
-  Resolves: CVE-2023-0401
-
-* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1:3.0.7-4
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
-
-* Thu Jan 05 2023 Dmitry Belyavskiy <dbelyavs@redhat.com> - 1:3.0.7-3
-- Backport implicit rejection for RSA PKCS#1 v1.5 encryption
-  Resolves: rhbz#2153470
-
-* Thu Jan 05 2023 Dmitry Belyavskiy <dbelyavs@redhat.com> - 1:3.0.7-2
-- Refactor embedded mac verification in FIPS module
-  Resolves: rhbz#2156045
-
-* Fri Dec 23 2022 Dmitry Belyavskiy <dbelyavs@redhat.com> - 1:3.0.7-1
-- Rebase to upstream version 3.0.7
-- C99 compatibility in downstream-only 0032-Force-fips.patch
-  Resolves: rhbz#2152504
-- Adjusting include for the FIPS_mode macro
-  Resolves: rhbz#2083876
-
-* Wed Nov 16 2022 Simo sorce <simo@redhat.com> - 1:3.0.5-7
-- Backport patches to fix external providers compatibility issues
-
-* Tue Nov 01 2022 Dmitry Belyavskiy <dbelyavs@redhat.com> - 1:3.0.5-6
-- CVE-2022-3602: X.509 Email Address Buffer Overflow
-- CVE-2022-3786: X.509 Email Address Buffer Overflow
-  Resolves: CVE-2022-3602
-  Resolves: CVE-2022-3786
-
-* Mon Sep 12 2022 Dmitry Belyavskiy <dbelyavs@redhat.com> - 1:3.0.5-5
-- Update patches to make ELN build happy
-  Resolves: rhbz#2123755
-
-* Fri Sep 09 2022 Clemens Lang <cllang@redhat.com> - 1:3.0.5-4
-- Fix AES-GCM on Power 8 CPUs
-  Resolves: rhbz#2124845
-
-* Thu Sep 01 2022 Dmitry Belyavskiy <dbelyavs@redhat.com> - 1:3.0.5-3
-- Sync patches with RHEL
-  Related: rhbz#2123755
-* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1:3.0.5-2
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
-
-* Tue Jul 05 2022 Clemens Lang <cllang@redhat.com> - 1:3.0.5-1
-- Rebase to upstream version 3.0.5
-  Related: rhbz#2099972, CVE-2022-2097
-
-* Wed Jun 01 2022 Dmitry Belyavskiy <dbelyavs@redhat.com> - 1:3.0.3-1
-- Rebase to upstream version 3.0.3
-
-* Thu Apr 28 2022 Clemens Lang <cllang@redhat.com> - 1:3.0.2-5
-- Instrument with USDT probes related to SHA-1 deprecation
-
-* Wed Apr 27 2022 Clemens Lang <cllang@redhat.com> - 1:3.0.2-4
-- Support rsa_pkcs1_md5_sha1 in TLS 1.0/1.1 with rh-allow-sha1-signatures = yes
-  to restore TLS 1.0 and 1.1 support in LEGACY crypto-policy.
-  Related: rhbz#2069239
-
-* Tue Apr 26 2022 Alexander Sosedkin <asosedkin@redhat.com> - 1:3.0.2-4
-- Instrument with USDT probes related to SHA-1 deprecation
-
-* Wed Apr 20 2022 Clemens Lang <cllang@redhat.com> - 1:3.0.2-3
-- Disable SHA-1 by default in ELN using the patches from CentOS
-- Fix a FIXME in the openssl.cnf(5) manpage
-
-* Thu Apr 07 2022 Clemens Lang <cllang@redhat.com> - 1:3.0.2-2
-- Silence a few rpmlint false positives.
-
-* Thu Apr 07 2022 Clemens Lang <cllang@redhat.com> - 1:3.0.2-2
-- Allow disabling SHA1 signature creation and verification.
-  Set rh-allow-sha1-signatures = no to disable.
-  Allow SHA1 in TLS in SECLEVEL 1 if rh-allow-sha1-signatures = yes. This will
-  support SHA1 in TLS in the LEGACY crypto-policy.
-  Resolves: rhbz#2070977
-  Related: rhbz#2031742, rhbz#2062640
-
-* Fri Mar 18 2022 Dmitry Belyavskiy <dbelyavs@redhat.com> - 1:3.0.2-1
-- Rebase to upstream version 3.0.2
-
-* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1:3.0.0-2
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
-
-* Thu Sep 09 2021 Sahana Prasad <sahana@redhat.com> - 1:3.0.0-1
-- Rebase to upstream version 3.0.0
+* Tue Dec 05 2023 Stanislav Zidek <szidek@redhat.com> - 3.3.0-dev
++ openssl-3.3.0-dev
+- spec file for compilation in GitHub CI Fedora 39 container
