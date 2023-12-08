@@ -76,7 +76,7 @@ rlJournalStart
         declare -a C_OSSLPROTO
 
 
-        # FIXME: TLS 1.1 is broken in crypto-policies in Fedora 39
+        # FIXME: TLS 1.1 is broken in crypto-policies in Fedora 39 - bz2249810
         #if [[ $fips -ne 0 ]] && (rlIsRHEL '<9' || rlIsFedora); then
         if [[ $fips -ne 0 ]] && (rlIsRHEL '<9' || rlIsFedora '<39'); then
             C_TEST[$i]="TLS-1.1 SHA1-MD5 PRF"

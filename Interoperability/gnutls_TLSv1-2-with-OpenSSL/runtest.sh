@@ -452,7 +452,7 @@ rlJournalStart
             protos=(tls1_2)
         # On 9 tls1.1 is not allowed, but it's still allowed in Fedora
         #elif rlIsRHEL '<9' || rlIsFedora; then
-        # FIXME and TLS 1.1 is broken in crypto-policies on Fedora 39
+        # FIXME and TLS 1.1 is broken in crypto-policies on Fedora 39 - bz2249810
         elif rlIsRHEL '<9' || rlIsFedora '<39'; then
             protos=(tls1_2 tls1_1)
         else
