@@ -55,6 +55,8 @@ $(METADATA): Makefile
 	@echo "TestTime:        90m" >> $(METADATA)
 	@echo "RunFor:          nss openssl" >> $(METADATA)
 	@echo "Requires:        net-tools nss nss-tools openssl expect" >> $(METADATA)
+	@echo "RhtsRequires:    library(openssl/certgen)" >> $(METADATA)
+	@echo "RhtsRequires:    library(distribution/fips)" >> $(METADATA)
 	@echo "Priority:        Normal" >> $(METADATA)
 	@echo "License:         GPLv2" >> $(METADATA)
 	@echo "Confidential:    no" >> $(METADATA)

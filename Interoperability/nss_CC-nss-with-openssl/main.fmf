@@ -1,32 +1,7 @@
 summary: Test CC relevant ciphers with NSS and openssl
 description: |
     Should be fixed in RHEL-6 through rebase to nss-3.44
-contact: Hubert  Kario <hkario@redhat.com>
-component:
-  - nss
-  - openssl
-test: ./runtest.sh
-framework: beakerlib
-recommend:
-  - net-tools
-  - nss
-  - nss-tools
-  - openssl
-  - expect
-duration: 90m
 enabled: true
-tag:
-  - NoRHEL4
-  - NoRHEL5
-  - NoRHEL6
-  - TIPpass_Security
-  - Tier3
-  - Tier3security
-  - TierCandidatesPASS
-  - interop
-  - interop-nss
-  - interop-openssl
-tier: '3'
 link:
   - relates: https://bugzilla.redhat.com/show_bug.cgi?id=1008542
   - relates: https://bugzilla.redhat.com/show_bug.cgi?id=1215760
@@ -39,6 +14,15 @@ link:
   - relates: https://bugzilla.redhat.com/show_bug.cgi?id=1234993
   - relates: https://bugzilla.redhat.com/show_bug.cgi?id=1234997
   - relates: https://bugzilla.redhat.com/show_bug.cgi?id=1316174
+tag:
+  - NoRHEL4
+  - NoRHEL5
+  - NoRHEL6
+  - TIPpass_Security
+  - Tier3
+  - Tier3security
+  - TierCandidatesPASS
+tier: '3'
 adjust:
   - enabled: false
     when: distro == rhel-4, rhel-5
@@ -46,6 +30,20 @@ adjust:
   - enabled: false
     when: distro ~< rhel-6.10
     continue: false
+contact: Hubert  Kario <hkario@redhat.com>
+component:
+  - openssl
+  - nss-softokn
+test: ./runtest.sh
+framework: beakerlib
+recommend:
+  - net-tools
+  - nss
+  - nss-tools
+  - openssl
+  - expect
+duration: 90m
 extra-nitrate: TC#0479192
 extra-summary: /CoreOS/nss/Interoperability/CC-nss-with-openssl
 extra-task: /CoreOS/nss/Interoperability/CC-nss-with-openssl
+id: 94d26548-8844-43a9-a5ff-45443b3edd1b
