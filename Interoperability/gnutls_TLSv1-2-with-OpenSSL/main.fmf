@@ -2,6 +2,34 @@ summary: Verify interoperability of GnuTLS TLSv1.2 with OpenSSL
 description: |+
     Fixed in rhel-6.9.0 
 
+enabled: true
+link:
+  - relates: https://bugzilla.redhat.com/show_bug.cgi?id=1321112
+  - relates: https://bugzilla.redhat.com/show_bug.cgi?id=1714245
+  - relates: https://bugzilla.redhat.com/show_bug.cgi?id=1238279
+tag:
+  - BrokenCI
+  - NoRHEL4
+  - NoRHEL5
+  - Tier2
+  - Tier2security
+  - interop
+  - interop-basic
+  - interop-gnutls
+  - interop-openssl
+  - results-yesterday-stable
+tier: '2'
+adjust:
+  - enabled: false
+    when: distro == rhel-4, rhel-5
+    continue: false
+  - enabled: false
+    when: distro ~< rhel-6.9
+    continue: false
+  - because: never seen working on 7.2
+    enabled: false
+    when: distro == rhel-7 and distro ~<= rhel-7.2
+    continue: false
 contact: Hubert  Kario <hkario@redhat.com>
 component:
   - openssl
@@ -14,34 +42,6 @@ recommend:
   - openssl
   - expect
 duration: 2h
-enabled: true
-tag:
-  - BrokenCI
-  - NoRHEL4
-  - NoRHEL5
-  - Tier2
-  - Tier2security
-  - results-yesterday-stable
-  - interop
-  - interop-openssl
-  - interop-gnutls
-  - interop-basic
-tier: '2'
-link:
-  - relates: https://bugzilla.redhat.com/show_bug.cgi?id=1321112
-  - relates: https://bugzilla.redhat.com/show_bug.cgi?id=1714245
-  - relates: https://bugzilla.redhat.com/show_bug.cgi?id=1238279
-adjust:
-  - enabled: false
-    when: distro == rhel-4, rhel-5
-    continue: false
-  - enabled: false
-    when: distro ~< rhel-6.9
-    continue: false
-  - because: never seen working on 7.2
-    enabled: false
-    when: distro == rhel-7 and distro ~<= rhel-7.2
-    continue: false
 extra-nitrate: TC#0521608
 extra-summary: /CoreOS/gnutls/Interoperability/TLSv1-2-with-OpenSSL
 extra-task: /CoreOS/gnutls/Interoperability/TLSv1-2-with-OpenSSL
