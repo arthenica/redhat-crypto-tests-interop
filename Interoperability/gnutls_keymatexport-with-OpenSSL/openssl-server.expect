@@ -3,7 +3,7 @@ set timeout 30
 spawn /bin/sh -c "$argv"
 trap { exec kill -SIGTERM [exp_pid] } SIGTERM
 expect {
-    "Secure Renegotiation" {
+    -re "Secure Renegotiation|This TLS version forbids renegotiation" {
         expect {
             "client hello" {
                 send "server hello\r"
