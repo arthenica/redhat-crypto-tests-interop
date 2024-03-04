@@ -22,6 +22,9 @@ tag:
   - Tier3
   - Tier3security
   - TierCandidatesPASS
+  - interop
+  - interop-nss
+  - interop-openssl
 tier: '3'
 adjust:
   - enabled: false
