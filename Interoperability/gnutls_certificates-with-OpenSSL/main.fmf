@@ -1,6 +1,6 @@
 summary: Verify interoperability of GnuTLS certificates with OpenSSL
 description: ''
-contact: Marek Havrila <mhavrila@redhat.com>
+contact: Ondrej Moris <omoris@redhat.com>
 component:
   - openssl
   - gnutls
@@ -34,3 +34,4 @@ adjust:
 extra-nitrate: TC#0602799
 extra-summary: /CoreOS/gnutls/Interoperability/certificates-with-OpenSSL
 extra-task: /CoreOS/gnutls/Interoperability/certificates-with-OpenSSL
+id: 6c6a2a52-7611-4cc3-9791-851d33616d92

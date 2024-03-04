@@ -13,8 +13,10 @@ expect {
     timeout { close; exit 8 }
 }
 expect {
-    -timeout 2
+    -timeout 3
     "Verify return code: 0" { }
+    "SSL-Session:" { exp_continue }
+    "TLS session ticket" { exp_continue }
     eof { exit 11 }
 # old GnuTLS servers send just one ticket, so accept such connections too
     timeout { send_user "3rd Verify timeout" }
