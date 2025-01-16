@@ -19,7 +19,7 @@ tag:
   - NoRHEL5
   - NoRHEL6
   - NoRHEL7
-  - noTier
+  - NoTier
   - interop
   - interop-gnutls
   - interop-openssl

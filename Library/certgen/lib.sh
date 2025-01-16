@@ -199,7 +199,7 @@ __INTERNAL_x509GenConfig() {
         local md="sha256"
     fi
     # current time in seconds from UNIX epoch
-    local now=$(date '+%s')
+    local now=$(env date '+%s')
     # date before which the certificate is not valid
     local notBefore=""
     # date after which the certificate is not valid
@@ -318,7 +318,7 @@ __INTERNAL_x509GenConfig() {
     if [ -z "$notBefore" ]; then
         notBefore="now"
     fi
-    notBefore=$(date -d "$notBefore" -u $x509FORMAT)
+    notBefore=$(env date -d "$notBefore" -u $x509FORMAT)
     if [ $? -ne 0 ]; then
         echo "x509GenConfig: notBefore date value is invalid" >&2
         return 1
@@ -327,7 +327,7 @@ __INTERNAL_x509GenConfig() {
     if [ -z "$notAfter" ]; then
         notAfter="1 year"
     fi
-    notAfter=$(date -d "$notAfter" -u $x509FORMAT)
+    notAfter=$(env date -d "$notAfter" -u $x509FORMAT)
     if [ $? -ne 0 ]; then
         echo "x509GenConfig: notAfter date value is invalid" >&2
         return 1
@@ -689,7 +689,9 @@ x509KeyGen() {
     fi
     if [[ $kType != "RSA" ]] && [[ $kType != "DSA" ]] \
         && [[ $kType != "ECDSA" ]] && [[ $kType != "RSA-PSS" ]] \
-        && [[ $kType != "ED25519" ]] && [[ $kType != "ED448" ]]; then
+        && [[ $kType != "ED25519" ]] && [[ $kType != "ED448" ]] \
+        && ! [[ $kType =~ MLDSA ]] && ! [[ $kType =~ SLHDSA ]] \
+        && ! [[ $kType =~ SPHINCS ]] ; then
 
         echo "x509KeyGen: Unknown key type: $kType" >&2
         return 1
@@ -785,6 +787,7 @@ x509KeyGen() {
         ${x509OPENSSL} genrsa -out "$kAlias/$x509PKEY" "$kSize"
         if [ $? -ne 0 ]; then
             echo "x509KeyGen: Key generation failed" >&2
+            return 1
         fi
     else # RSA-PSS, DH, GOST2001
         local options
@@ -800,6 +803,7 @@ x509KeyGen() {
         ${x509OPENSSL} genpkey "${options[@]}"
         if [ $? -ne 0 ]; then
             echo "x509KeyGen: Key generation failed" >&2
+            return 1
         fi
     fi
 
@@ -2080,7 +2084,7 @@ x509CertSign() {
     if [[ $certRole != "ca" ]] && [[ $certRole != "webserver" ]] \
         && [[ $certRole != "webclient" ]] && [[ $certRole != "none" ]]; then
 
-        echo "x509SelfSign: Unknown role: '$certRole'" >&2
+        echo "x509CertSign: Unknown role: '$certRole'" >&2
         return 1
     fi
 
@@ -3040,6 +3044,11 @@ This library works correctly only when sourced. I.e.:
 
     . ./lib.sh
 
+or imported using rlImport inside the beakerlib, i.e. after running
+
+    . /usr/share/beakerlib/beakerlib.sh
+    rlRun "rlImport certgen"
+
 =over
 
 =back
@@ -3063,6 +3072,15 @@ x509LibraryLoaded() {
         echo "certgen: error: "\
             "Non GNU enhanced version of getopt" 1>&2
         return 1
+    fi
+
+    # Only since OpenSSL 3.2.0 there's ability to run post-quantum algorithms
+    if ! ${x509OPENSSL} version | grep -qE '0[.]9[.]|1[.][01][.]|3[.][01][.]'; then
+        if ${x509OPENSSL} list -providers | grep -q 'oqsprovider'; then
+            rlLogInfo "OQS Provider loaded, PQC available"
+        else
+            rlLogInfo "OQS Provider not available, Post-Quantum Cryptography (PQC) UNavailable"
+        fi
     fi
 
     return 0

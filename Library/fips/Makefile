@@ -29,7 +29,7 @@ export TESTVERSION=1.0
 
 BUILT_FILES=
 
-FILES=$(METADATA) runtest.sh lib.sh Makefile rstrnt-package-workaround.sh
+FILES=$(METADATA) runtest.sh lib.sh Makefile
 
 .PHONY: all install download clean
 
@@ -52,7 +52,7 @@ $(METADATA): Makefile
 	@echo "Path:            $(TEST_DIR)" >> $(METADATA)
 	@echo "Description:     A set of helpers for FIPS 140 testing" >> $(METADATA)
 	@echo "Type:            Library" >> $(METADATA)
-	@echo "Requires:        coreutils crypto-policies crypto-policies-scripts fips-mode-setup" >> $(METADATA)
+	@echo "Requires:        coreutils crypto-policies crypto-policies-scripts fips-mode-setup grubby" >> $(METADATA)
 	@echo "TestTime:        30m" >> $(METADATA)
 	@echo "Provides:        library(distribution/fips)" >> $(METADATA)
 	@echo "License:         GPLv2" >> $(METADATA)

@@ -34,6 +34,8 @@ PACKAGES="openssl gnutls"
 
 TWAY=2way
 
+# bump for new library version
+
 rlJournalStart
     rlPhaseStartSetup
         rlAssertRpm --all

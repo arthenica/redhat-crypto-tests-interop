@@ -201,8 +201,10 @@ tls13interop_gnutls_openssl_setup() {
     rlRun 'x509KeyGen -t ecdsa -s prime256v1 ecdsa-p256-client'
     rlRun 'x509KeyGen -t ecdsa -s secp384r1 ecdsa-p384-client'
     rlRun 'x509KeyGen -t ecdsa -s secp521r1 ecdsa-p521-client'
-    rlRun 'x509KeyGen -t ed25519 ed25519-client'
-    rlRun 'x509KeyGen -t ed448 ed448-client'
+    if ! $FIPS; then
+        rlRun 'x509KeyGen -t ed25519 ed25519-client'
+        rlRun 'x509KeyGen -t ed448 ed448-client'
+    fi
     rlRun 'x509SelfSign ca'
     rlRun 'x509CertSign --CA ca -t ca --DN "CN=RSA CA" rsa-ca'
     rlRun 'x509CertSign --CA ca -t ca --DN "CN=RSA-PSS CA" rsa-pss-ca'
@@ -342,6 +344,9 @@ tls13interop_gnutls_openssl_test() {
         options+=(-connect localhost:4433)
         options+=(-keylogfile openssl_keylog.txt)
         options+=(-ciphersuites $C_OPENSSL)
+        if [[ $C_OPENSSL =~ CCM_8 ]] && ( ! rlIsRHEL '<9.5' || ! rlIsRHEL '<10' ); then
+            options+=(-cipher 'DEFAULT:@SECLEVEL=0')
+        fi
         if [[ -n $OPENSSL_SIG ]]; then
             options+=(-sigalgs $OPENSSL_SIG)
         fi
@@ -378,6 +383,9 @@ tls13interop_gnutls_openssl_test() {
             options+=(-connect localhost:4433)
             options+=(-keylogfile openssl_keylog.txt)
             options+=(-ciphersuites $C_OPENSSL)
+            if [[ $C_OPENSSL =~ CCM_8 ]] && ( ! rlIsRHEL '<9.5' || ! rlIsRHEL '<10' ); then
+                options+=(-cipher 'DEFAULT:@SECLEVEL=0')
+            fi
             if [[ -n $OPENSSL_SIG ]]; then
                 options+=(-sigalgs $OPENSSL_SIG)
             fi
@@ -407,6 +415,9 @@ tls13interop_gnutls_openssl_test() {
             options+=(-connect localhost:4433)
             options+=(-keylogfile openssl_keylog.txt)
             options+=(-ciphersuites $C_OPENSSL)
+            if [[ $C_OPENSSL =~ CCM_8 ]] && ( ! rlIsRHEL '<9.5' || ! rlIsRHEL '<10' ); then
+                options+=(-cipher 'DEFAULT:@SECLEVEL=0')
+            fi
             if [[ -n $OPENSSL_SIG ]]; then
                 options+=(-sigalgs $OPENSSL_SIG)
             fi
@@ -472,6 +483,9 @@ tls13interop_gnutls_openssl_test() {
         options+=(-key $(x509Key $cert-server))
         options+=(-keylogfile openssl_keylog.txt)
         options+=(-ciphersuites $C_OPENSSL)
+        if [[ $C_OPENSSL =~ CCM_8 ]] && ( ! rlIsRHEL '<9.5' || ! rlIsRHEL '<10' ); then
+            options+=(-cipher 'DEFAULT:@SECLEVEL=0')
+        fi
 
         rlRun "${options[*]} >server.log 2>server.err &"
         openssl_pid=$!
@@ -564,6 +578,9 @@ tls13interop_gnutls_openssl_test() {
         options+=(-connect localhost:4433)
         options+=(-keylogfile openssl_keylog.txt)
         options+=(-ciphersuites $C_OPENSSL)
+        if [[ $C_OPENSSL =~ CCM_8 ]] && ( ! rlIsRHEL '<9.5' || ! rlIsRHEL '<10' ); then
+            options+=(-cipher 'DEFAULT:@SECLEVEL=0')
+        fi
         if [[ -n $OPENSSL_SIG ]]; then
             options+=(-sigalgs $OPENSSL_SIG)
         fi
@@ -601,6 +618,9 @@ tls13interop_gnutls_openssl_test() {
             options+=(-key $(x509Key ${cert}-client))
             options+=(-cert $(x509Cert ${cert}-client))
             options+=(-ciphersuites $C_OPENSSL)
+            if [[ $C_OPENSSL =~ CCM_8 ]] && ( ! rlIsRHEL '<9.5' || ! rlIsRHEL '<10' ); then
+                options+=(-cipher 'DEFAULT:@SECLEVEL=0')
+            fi
             if [[ -n $OPENSSL_SIG ]]; then
                 options+=(-sigalgs $OPENSSL_SIG)
             fi
@@ -632,6 +652,9 @@ tls13interop_gnutls_openssl_test() {
             options+=(-connect localhost:4433)
             options+=(-keylogfile openssl_keylog.txt)
             options+=(-ciphersuites $C_OPENSSL)
+            if [[ $C_OPENSSL =~ CCM_8 ]] && ( ! rlIsRHEL '<9.5' || ! rlIsRHEL '<10' ); then
+                options+=(-cipher 'DEFAULT:@SECLEVEL=0')
+            fi
             if [[ -n $OPENSSL_SIG ]]; then
                 options+=(-sigalgs $OPENSSL_SIG)
             fi
@@ -689,9 +712,11 @@ tls13interop_gnutls_openssl_test() {
         options+=(-build_chain)
         options+=(-cert $(x509Cert $cert-server))
         options+=(-key $(x509Key $cert-server))
-        options+=(-ciphersuites $C_OPENSSL)
         options+=(-keylogfile openssl_keylog.txt)
         options+=(-ciphersuites $C_OPENSSL)
+        if [[ $C_OPENSSL =~ CCM_8 ]] && ( ! rlIsRHEL '<9.5' || ! rlIsRHEL '<10' ); then
+            options+=(-cipher 'DEFAULT:@SECLEVEL=0')
+        fi
         options+=(-Verify 3)
         rlRun "${options[*]} >server.log 2>server.err &"
         openssl_pid=$!
