@@ -43,6 +43,7 @@ rlJournalStart
         rlRun "TmpDir=\$(mktemp -d)" 0 "Creating tmp directory"
         rlRun "cp nss-client.expect $TmpDir"
         rlRun "pushd $TmpDir"
+        rlRun "dnf remove -y softhsm" 0-255 "Remove conflicting package"
         hostname="localhost" # needed in GitLab CI
         if rlIsRHEL '<7'; then
             hostname="localhost4" # needed in RHEL-6
