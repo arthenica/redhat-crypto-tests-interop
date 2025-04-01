@@ -1,0 +1,14 @@
+#!/usr/bin/expect
+set timeout 30
+spawn /bin/sh -c "$argv"
+trap { exec kill -SIGTERM [exp_pid] } SIGTERM
+expect {
+    "Enter Password" { send "RedHatEnterpriseLinux6.6\r"; exp_continue }
+    eof { }
+    "client hello" { send "server hello\r";
+                     close; exp_continue }
+    timeout { close; exit 7 }
+}
+set info [wait]
+#puts "Return from wait: $info"
+exit [lindex $info 3]

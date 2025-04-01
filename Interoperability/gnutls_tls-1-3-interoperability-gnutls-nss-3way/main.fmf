@@ -7,6 +7,10 @@ component:
   - gnutls
 test: ./runtest.sh
 framework: beakerlib
+require:
+  - {'type': 'library', 'path': '/libs/openssl', 'name': '/certgen'}
+  - {'type': 'library', 'path': '/libs/distribution', 'name': '/fips'}
+  - {'type': 'library', 'path': '/libs/gnutls', 'name': '/tls-1-3-interoperability-gnutls-nss'}
 recommend:
   - expect
   - gnutls

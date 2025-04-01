@@ -1,0 +1,22 @@
+#!/usr/bin/expect
+set timeout 30
+spawn /bin/sh -c "$argv"
+expect {
+    "Handshake was completed" {
+        if [string match {*--inline-commands*} $argv] {
+            send "^rekey^\r"
+        }
+        send "GET / HTTP/1.0\r\r";
+        expect {
+            "EOF" {
+                    close
+            }
+            eof { exit 9 }
+            timeout { exit 10 }
+        }
+    }
+    eof { exit 7 }
+    timeout { close; exit 8 }
+}
+set info [wait]
+exit [lindex $info 3]

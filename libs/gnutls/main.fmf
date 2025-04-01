@@ -7,6 +7,8 @@ component:
 test: ./runtest.sh
 framework: beakerlib
 require:
+  - {'type': 'library', 'path': '/libs/openssl', 'name': '/certgen'}
+  - {'type': 'library', 'path': '/libs/distribution', 'name': '/fips'}
   - expect
   - gnutls
   - gnutls-utils

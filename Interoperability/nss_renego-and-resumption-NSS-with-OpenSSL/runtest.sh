@@ -44,11 +44,11 @@ NSS_POLICY="/etc/crypto-policies/back-ends/nss.config"
 rlJournalStart
     rlPhaseStartSetup
         rlAssertRpm --all
-        rlRun "rlImport certgen"
+        rlRun "rlImport openssl/certgen"
         rlRun "TmpDir=\$(mktemp -d)" 0 "Creating tmp directory"
         rlRun "cp nss-{client,server}.expect nss-client-normal.expect openssl-client.expect openssl-client-renego.expect rfc7919-ffdhe2048.pem openssl-client-resume.expect $TmpDir"
         rlRun "pushd $TmpDir"
-        rlRun "rlImport fips"
+        rlRun "rlImport distribution/fips"
         fipsIsEnabled
         _fips=$?
         if [[ $_fips -eq 0 ]]; then

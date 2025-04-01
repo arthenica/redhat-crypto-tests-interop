@@ -2,8 +2,8 @@
 # vim: dict+=/usr/share/beakerlib/dictionary.vim cpt=.,w,b,u,t,i,k
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-#   lib.sh of /CoreOS/openssl/Library/tls-1-3-interoperability-nss-openssl
-#   Description: Test TLS 1.3 interoperability between NSS and OpenSSL
+#   lib.sh of /CoreOS/gnutls/Library/tls-1-3-interoperability-gnutls-nss
+#   Description: Test TLS 1.3 interoperability between NSS and GnuTLS
 #   Author: Hubert Kario <hkario@redhat.com>
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -25,166 +25,166 @@
 #   Boston, MA 02110-1301, USA.
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#   library-prefix = tls13interop_nss_openssl
+#   library-prefix = tls13interop_gnutls_nss
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # Remember the library directory so that we'll know where to find .expect files
-export tls13interop_nss_openssl_EXPECTS=$(realpath $(dirname $BASH_SOURCE))
+export tls13interop_gnutls_nss_EXPECTS=$(realpath $(dirname $BASH_SOURCE))
 
-
-function tls13interop_nss_opensslLibraryLoaded {( set -uex
+function tls13interop_gnutls_nssLibraryLoaded {( set -uex
     pushd /
-    [[ -x $tls13interop_nss_openssl_EXPECTS/nss-client.expect ]]
-    [[ -x $tls13interop_nss_openssl_EXPECTS/nss-server.expect ]]
-    [[ -x $tls13interop_nss_openssl_EXPECTS/openssl-client.expect ]]
-    [[ -x $tls13interop_nss_openssl_EXPECTS/openssl-rekey.expect ]]
+    [[ -x $tls13interop_gnutls_nss_EXPECTS/gnutls-client.expect ]]
+    [[ -x $tls13interop_gnutls_nss_EXPECTS/gnutls-resume.expect ]]
+    [[ -x $tls13interop_gnutls_nss_EXPECTS/openssl-client.expect ]]
+    [[ -x $tls13interop_gnutls_nss_EXPECTS/openssl-rekey.expect ]]
     popd
     return 0
 )}
 
-
-tls13interop_nss_openssl_CIPHER_NAMES=()
-tls13interop_nss_openssl_CIPHER_NAMES+=('TLS_AES_128_GCM_SHA256')
-tls13interop_nss_openssl_CIPHER_NAMES+=('TLS_AES_256_GCM_SHA384')
-tls13interop_nss_openssl_CIPHER_NAMES+=('TLS_CHACHA20_POLY1305_SHA256')
+tls13interop_gnutls_nss_CIPHER_NAMES=()
+tls13interop_gnutls_nss_CIPHER_NAMES+=('TLS_AES_128_GCM_SHA256')
+tls13interop_gnutls_nss_CIPHER_NAMES+=('TLS_AES_256_GCM_SHA384')
+tls13interop_gnutls_nss_CIPHER_NAMES+=('TLS_CHACHA20_POLY1305_SHA256')
 # unsupported by NSS 3.38.0
-#tls13interop_nss_openssl_CIPHER_NAMES+=('TLS_AES_128_CCM_SHA256')
+#tls13interop_gnutls_nss_CIPHER_NAMES+=('TLS_AES_128_CCM_SHA256')
 # unsupported by NSS (source: hkario)
-#tls13interop_nss_openssl_CIPHER_NAMES+=('TLS_AES_128_CCM_8_SHA256')
+#tls13interop_gnutls_nss_CIPHER_NAMES+=('TLS_AES_128_CCM_8_SHA256')
 
-tls13interop_nss_openssl_cipher_info() { local c_name=$1
+tls13interop_gnutls_nss_cipher_info() { local c_name=$1
     case $c_name in
     TLS_AES_128_GCM_SHA256)
+        C_GNUTLS='TLS_AES_128_GCM_SHA256'
         C_OPENSSL='TLS_AES_128_GCM_SHA256'
         C_ID='1301'
     ;;
     TLS_AES_256_GCM_SHA384)
+        C_GNUTLS='TLS_AES_256_GCM_SHA384'
         C_OPENSSL='TLS_AES_256_GCM_SHA384'
         C_ID='1302'
     ;;
     TLS_CHACHA20_POLY1305_SHA256)
+        C_GNUTLS='TLS_CHACHA20_POLY1305_SHA256'
         C_OPENSSL='TLS_CHACHA20_POLY1305_SHA256'
         C_ID='1303'
     ;;
+    # unsupported by NSS 3.38.0
     #TLS_AES_128_CCM_SHA256)
+    #    C_GNUTLS='TLS_AES_128_CCM_SHA256'
     #    C_OPENSSL='TLS_AES_128_CCM_SHA256'
     #    C_ID='1304'
     #;;
     #TLS_AES_128_CCM_8_SHA256)
+    #    C_GNUTLS='TLS_AES_128_CCM_8_SHA256'
     #    C_OPENSSL='TLS_AES_128_CCM_8_SHA256'
     #    C_ID='1305'
     #;;
     *) rlDie "Unknown cipher name $c_name";;
     esac
-    echo $C_OPENSSL $C_ID
+    echo $C_GNUTLS $C_OPENSSL $C_ID
 }
 
 
-tls13interop_nss_openssl_GROUP_NAMES=()
-tls13interop_nss_openssl_GROUP_NAMES+=('default')
-tls13interop_nss_openssl_GROUP_NAMES+=('P-256')
-tls13interop_nss_openssl_GROUP_NAMES+=('P-384')
-tls13interop_nss_openssl_GROUP_NAMES+=('P-521')
-tls13interop_nss_openssl_GROUP_NAMES+=('X25519')
+tls13interop_gnutls_nss_GROUP_NAMES=()
+tls13interop_gnutls_nss_GROUP_NAMES+=('default')
+tls13interop_gnutls_nss_GROUP_NAMES+=('P-256')
+tls13interop_gnutls_nss_GROUP_NAMES+=('P-384')
+tls13interop_gnutls_nss_GROUP_NAMES+=('P-521')
+tls13interop_gnutls_nss_GROUP_NAMES+=('X25519')
 # X448 is not supported by NSS
-if ! rlIsRHEL '<9'; then
-    # FFDHE is not supported by OpenSSL 1.1.1 RHBZ#1593671
-    # https://github.com/openssl/openssl/issues/6519
-    # added in RHEL-9 with OpenSSL 3.0.0
-    tls13interop_nss_openssl_GROUP_NAMES+=('FFDHE2048')
-    tls13interop_nss_openssl_GROUP_NAMES+=('FFDHE3072')
-    tls13interop_nss_openssl_GROUP_NAMES+=('FFDHE4096')
-    tls13interop_nss_openssl_GROUP_NAMES+=('FFDHE6144')
-    tls13interop_nss_openssl_GROUP_NAMES+=('FFDHE8192')
-fi
+tls13interop_gnutls_nss_GROUP_NAMES+=('FFDHE2048')
+tls13interop_gnutls_nss_GROUP_NAMES+=('FFDHE3072')
+tls13interop_gnutls_nss_GROUP_NAMES+=('FFDHE4096')
+tls13interop_gnutls_nss_GROUP_NAMES+=('FFDHE6144')
+tls13interop_gnutls_nss_GROUP_NAMES+=('FFDHE8192')
 
-tls13interop_nss_openssl_group_info() { local g_name=$1
+tls13interop_gnutls_nss_group_info() { local g_name=$1
     case $g_name in
     default)
-        G_OPENSSL=''
+        G_GNUTLS=''
         G_NSS=''
-        G_OPENSSL_HRR=''
+        G_GNUTLS_HRR=''
         G_NSS_HRR=''
         ;;
     P-256)
-        G_OPENSSL='P-256'
+        G_GNUTLS=':-GROUP-ALL:+GROUP-SECP256R1'
         G_NSS='P256'
-        G_OPENSSL_HRR='P-384:P-256'
+        G_GNUTLS_HRR=':-GROUP-ALL:+GROUP-SECP384R1:+GROUP-SECP256R1'
         G_NSS_HRR='P384,P256'
     ;;
     P-384)
-        G_OPENSSL='P-384'
+        G_GNUTLS=':-GROUP-ALL:+GROUP-SECP384R1'
         G_NSS='P384'
-        G_OPENSSL_HRR='P-256:P-384'
+        G_GNUTLS_HRR=':-GROUP-ALL:+GROUP-SECP256R1:+GROUP-SECP384R1'
         G_NSS_HRR='P256,P384'
     ;;
     P-521)
-        G_OPENSSL='P-521'
+        G_GNUTLS=':-GROUP-ALL:+GROUP-SECP521R1'
         G_NSS='P521'
-        G_OPENSSL_HRR='P-256:P-521'
+        G_GNUTLS_HRR=':-GROUP-ALL:+GROUP-SECP256R1:+GROUP-SECP521R1'
         G_NSS_HRR='P256,P521'
     ;;
     X25519)
-        G_OPENSSL='X25519'
+        G_GNUTLS=':-GROUP-ALL:+GROUP-X25519'
         G_NSS='x25519'
-        G_OPENSSL_HRR='P-256:X25519'
+        G_GNUTLS_HRR=':-GROUP-ALL:+GROUP-SECP256R1:+GROUP-X25519'
         G_NSS_HRR='P256,x25519'
     ;;
     #X448)
         # not supported by NSS
     #;;
     FFDHE2048)
-        G_OPENSSL='ffdhe2048'
+        G_GNUTLS=':-GROUP-ALL:+GROUP-FFDHE2048'
         G_NSS='FF2048'
-        G_OPENSSL_HRR='P-256:ffdhe2048'
-        G_NSS_HRR='P384,FF2048'
+        G_GNUTLS_HRR=':-GROUP-ALL:+GROUP-FFDHE3072:+GROUP-FFDHE2048'
+        G_NSS_HRR='P256,FF2048'
     ;;
     FFDHE3072)
-        G_OPENSSL='ffdhe3072'
+        G_GNUTLS=':-GROUP-ALL:+GROUP-FFDHE3072'
         G_NSS='FF3072'
-        G_OPENSSL_HRR='ffdhe2048:ffdhe3072'
-        G_NSS_HRR='FF4096,FF3072'
+        G_GNUTLS_HRR=':-GROUP-ALL:+GROUP-FFDHE2048:+GROUP-FFDHE3072'
+        G_NSS_HRR='P256,FF3072'
     ;;
     FFDHE4096)
-        G_OPENSSL='ffdhe4096'
+        G_GNUTLS=':-GROUP-ALL:+GROUP-FFDHE4096'
         G_NSS='FF4096'
-        G_OPENSSL_HRR='ffdhe8192:ffdhe4096'
-        G_NSS_HRR='FF6144,FF4096'
+        G_GNUTLS_HRR=':-GROUP-ALL:+GROUP-FFDHE8192:+GROUP-FFDHE4096'
+        G_NSS_HRR='FF2048,FF4096'
     ;;
     FFDHE6144)
-        G_OPENSSL='ffdhe6144'
+        G_GNUTLS=':-GROUP-ALL:+GROUP-FFDHE6144'
         G_NSS='FF6144'
-        G_OPENSSL_HRR='ffdhe4096:ffdhe6144'
-        G_NSS_HRR='FF8192,FF6144'
+        G_GNUTLS_HRR=':-GROUP-ALL:+GROUP-FFDHE8192:+GROUP-FFDHE6144'
+        G_NSS_HRR='FF2048,FF6144'
     ;;
     FFDHE8192)
-        G_OPENSSL='ffdhe8192'
+        G_GNUTLS=':-GROUP-ALL:+GROUP-FFDHE8192'
         G_NSS='FF8192'
-        G_OPENSSL_HRR='ffdhe6144:ffdhe8192'
-        G_NSS_HRR='FF4096,FF8192'
+        G_GNUTLS_HRR=':-GROUP-ALL:+GROUP-FFDHE2048:+GROUP-FFDHE8192'
+        G_NSS_HRR='P256,FF8192'
     ;;
     *) rlDie "Unknown group name $g_name";;
     esac
-    echo $G_OPENSSL $G_NSS $G_OPENSSL_HRR $G_NSS_HRR
+    echo $G_GNUTLS $G_NSS $G_GNUTLS_HRR $G_NSS_HRR
 }
 
 
-tls13interop_nss_openssl_setup() {
-    rlAssertRpm expect
+tls13interop_gnutls_nss_setup() {
+    rlAssertRpm gnutls
     rlAssertRpm nss
     rlAssertRpm nss-tools
     rlAssertRpm openssl
+    rlAssertRpm expect
 
-    rlRun 'rlImport certgen'
+    rlRun 'rlImport openssl/certgen'
 
-    rlRun 'rlImport fips'
+    rlRun 'rlImport distribution/fips'
     fipsIsEnabled && FIPS=true || FIPS=false
 
     if rlIsRHEL '<8.1' && ! $FIPS; then
         # workaround BZ#1694603
-        local nss_pol='/etc/crypto-policies/back-ends/nss.config'
-        rlRun "rlFileBackup $nss_pol"
-        rlRun "sed -i 's/ allow=/ allow=CURVE25519:/' $nss_pol"
+        rlRun 'rlFileBackup /etc/crypto-policies/back-ends/nss.config'
+        rlRun "sed -i 's/config=\"[^\"]*/&:CURVE25519/' /etc/crypto-policies/back-ends/nss.config"
+        rlLog 'Updated nss crypto-policies backend to allow x25519'
     fi
     rlRun 'x509KeyGen ca'
     rlRun 'x509KeyGen rsa-ca'
@@ -238,17 +238,18 @@ tls13interop_nss_openssl_setup() {
     rlRun 'mkdir ca-db' \
         0 'Create a directory with just a CA certificate'
     rlRun 'certutil -N --empty-password -d sql:./ca-db' \
-        0 'Create a database for the CA cert'
+        0 'Create a database for CA cert'
     rlRun "certutil -A -d sql:./ca-db -n ca -t 'cC,,' -a -i $(x509Cert ca)" \
         0 'Import CA certificate'
 }
 
 
-tls13interop_nss_openssl_test() {
+tls13interop_gnutls_nss_test() {
     local cert=$1 c_name=$2 c_sig=$3
     local g_name=$4 g_type=$5 sess_type=$6 k_update=$7
     rlGetPhaseState
     local START_ECODE=$ECODE
+
 
     if [[ $g_type == ' HRR' && $g_name == 'default' ]]; then
         rlDie 'Do not use HRR with default key exchange as by default all groups are enabled'
@@ -258,8 +259,15 @@ tls13interop_nss_openssl_test() {
         rlDie "cert $cert c_sig $c_sig invalid: for ECDSA, the hash is bound to the key type"
     fi
 
-    local EXPECTS=$tls13interop_nss_openssl_EXPECTS
-    export SSLKEYLOGFILE=key_log_file.txt
+    if $FIPS && [[ $c_name = TLS_CHACHA20_POLY1305_SHA256 ]]; then
+        rlDie "CHACHA20_POLY1305 is not allowed in FIPS mode"
+    fi
+    if $FIPS && [[ $g_name = X25519 ]]; then
+        rlDie "X25519 is not allowed in FIPS mode"
+    fi
+    local GNUTLS_PRIO="NORMAL:+VERS-TLS1.3"
+    local EXPECTS=$tls13interop_gnutls_nss_EXPECTS
+    export SSLKEYLOGFILE='nss_log_file.txt'
     local SERVER_UTIL='/usr/lib/nss/unsupported-tools/selfserv'
     local CLIENT_UTIL='/usr/lib/nss/unsupported-tools/tstclnt'
     local STRSCLNT_UTIL='/usr/lib/nss/unsupported-tools/strsclnt'
@@ -270,58 +278,45 @@ tls13interop_nss_openssl_test() {
     [ -f /usr/lib64/nss/unsupported-tools/strsclnt ] && \
         STRSCLNT_UTIL='/usr/lib64/nss/unsupported-tools/strsclnt'
 
-    local C_OPENSSL C_ID
-    read C_OPENSSL C_ID \
-        <<<$(tls13interop_nss_openssl_cipher_info $c_name)
+    local C_GNUTLS C_OPENSSL C_ID
+    read C_GNUTLS C_OPENSSL C_ID \
+       <<<$(tls13interop_gnutls_nss_cipher_info $c_name)
 
-    local G_OPENSSL G_NSS G_OPENSSL_HRR G_NSS_HRR
-    read G_OPENSSL G_NSS G_OPENSSL_HRR G_NSS_HRR \
-        <<<$(tls13interop_nss_openssl_group_info $g_name)
+    local G_GNUTLS G_NSS G_GNUTLS_HRR G_NSS_HRR
+    read G_GNUTLS G_NSS G_GNUTLS_HRR G_NSS_HRR \
+       <<<$(tls13interop_gnutls_nss_group_info $g_name)
 
     if [[ $c_sig != 'default' ]]; then
-        if [[ $cert == rsa ]]; then
-            OPENSSL_SIG="rsa_pss_rsae_${c_sig,,}"
-        else
-            OPENSSL_SIG="rsa_pss_pss_${c_sig,,}"
-        fi
+        GNUTLS_SIG=":-SIGN-ALL:+SIGN-RSA-PSS-RSAE-$c_sig:+SIGN-RSA-PSS-$c_sig"
     else
-        OPENSSL_SIG=''
+        GNUTLS_SIG=''
     fi
 
     # NSS tools can't request or send KeyUpdate
     if [[ $k_update != ' key update' ]]; then
+
         if [[ $tls13interop_no_phases ]]; then
             rlLogInfo "::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::"
-            rlLogInfo "::  OpenSSL server NSS client $C_OPENSSL cipher $cert cert $c_sig sig_alg $g_name kex$g_type$sess_type$k_update"
+            rlLogInfo "::  GnuTLS server NSS client $c_name cipher $cert cert $c_sig sig_alg $g_name kex$g_type$sess_type$k_update"
             rlLogInfo "::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::"
         else
-            rlPhaseStartTest "OpenSSL server NSS client $C_OPENSSL cipher $cert cert $c_sig sig_alg $g_name kex$g_type$sess_type$k_update"
+            rlPhaseStartTest "GnuTLS server NSS client $c_name cipher $cert cert $c_sig sig_alg $g_name kex$g_type$sess_type$k_update"
         fi
             [[ $DEBUG ]] && rlRun 'tcpdump -i lo -B 1024 -s 0 -U -w capture.pcap port 4433 &'
             [[ $DEBUG ]] && tcpdump_pid=$!
             [[ $DEBUG ]] && sleep 1.5 &
             [[ $DEBUG ]] && sleep_pid=$!
-            rlRun "openssl x509 -in $(x509Cert ca) -trustout -out trust.pem"
-            rlRun "cat $(x509Cert $cert-ca) >> trust.pem"
-            declare -a options=(openssl s_server -www)
-            if [[ $G_OPENSSL ]]; then
-                options+=(-groups $G_OPENSSL)
-            fi
-            if [[ -n $OPENSSL_SIG ]]; then
-                options+=(-sigalgs $OPENSSL_SIG)
-            fi
-            options+=(-CAfile trust.pem)
-            options+=(-build_chain)
-            options+=(-cert $(x509Cert $cert-server))
-            options+=(-key $(x509Key $cert-server))
-            options+=(-keylogfile openssl_keylog.txt)
-            options+=(-ciphersuites $C_OPENSSL)
-
-            rlRun "${options[*]} >server.log 2>server.err &"
-            openssl_pid=$!
-            rlRun "rlWaitForSocket -d 0.1 4433 -p $openssl_pid"
+            options=(gnutls-serv)
+            options+=(--http)
+            options+=(-p 4433)
+            options+=(--x509keyfile $(x509Key ${cert}-server))
+            options+=(--x509certfile '<(cat $(x509Cert ${cert}-server) $(x509Cert ${cert}-ca))')
+            options+=(--priority $GNUTLS_PRIO$GNUTLS_SIG$G_GNUTLS)
+            options+=('>server.log' '2>server.err')
+            rlRun "${options[*]} &"
+            gnutls_pid=$!
+            rlRun "rlWaitForSocket 4433 -d 0.1 -p $gnutls_pid"
             [[ $DEBUG ]] && rlRun "rlWaitForFile capture.pcap -d 0.1 -p $tcpdump_pid"
-
             if [[ $sess_type == ' resume' ]]; then
                 options=($STRSCLNT_UTIL)
                 options+=(-c 10 -P 20)
@@ -356,17 +351,16 @@ tls13interop_nss_openssl_test() {
             fi
 
             if [[ $sess_type == ' resume' ]]; then
-                # waiving the bug 1731182, normally it should be
-                # "8 cache hits" and "8 stateless resumes"
-                rlAssertGrep '[12345678] cache hits' client.log -E
-                rlAssertGrep '[12345678] stateless resumes' client.log -E
+                # waiving bug 1731182
+                # normally it should be "8 cache hits" and "8 stateless resumes"
+                rlAssertGrep '[12345678] cache hits' 'client.log' -E
+                rlAssertGrep '[12345678] stateless resumes' 'client.log' -E
             else
-                rlAssertGrep 'GET / HTTP/1.0' client.log
-                rlAssertGrep 'HTTP/1.0 200 ok' client.log
-                rlAssertGrep "$C_OPENSSL" client.log
+                # rlAssertGrep 'GET / HTTP/1.0' client.log  # can get torn apart
+                rlAssertGrep 'HTTP/1.0 200 OK' client.log
             fi
-            rlRun "kill $openssl_pid"
-            rlRun "rlWait -s 9 $openssl_pid" 143
+            rlRun "kill $gnutls_pid"
+            rlRun "rlWait -s 9 $gnutls_pid" 1
             [[ $DEBUG ]] && rlRun "rlWait -s 9 $sleep_pid"
             [[ $DEBUG ]] && rlRun "kill $tcpdump_pid"
             [[ $DEBUG ]] && rlRun "rlWait -s 9 $tcpdump_pid"
@@ -387,10 +381,10 @@ tls13interop_nss_openssl_test() {
 
     if [[ $tls13interop_no_phases ]]; then
         rlLogInfo "::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::"
-        rlLogInfo "::  NSS server OpenSSL client $C_OPENSSL cipher $cert cert $c_sig sig_alg $g_name kex$g_type$sess_type$k_update"
+        rlLogInfo "::  NSS server GnuTLS client $c_name cipher $cert cert $c_sig sig_alg $g_name kex$g_type$sess_type$k_update"
         rlLogInfo "::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::"
     else
-        rlPhaseStartTest "NSS server OpenSSL client $C_OPENSSL cipher $cert cert $c_sig sig_alg $g_name kex$g_type$sess_type$k_update"
+        rlPhaseStartTest "NSS server GnuTLS client $c_name cipher $cert cert $c_sig sig_alg $g_name kex$g_type$sess_type$k_update"
     fi
         rlLogInfo 'Preparing NSS database'
         rlRun 'mkdir nssdb/'
@@ -405,17 +399,14 @@ tls13interop_nss_openssl_test() {
         [[ $DEBUG ]] && sleep 1.5 &
         [[ $DEBUG ]] && sleep_pid=$!
         declare -a options=()
-        options+=($SERVER_UTIL -d sql:./nssdb/ -p 4433
-                  -c :${C_ID} -H 1)
+        options+=(${SERVER_UTIL} -d sql:./nssdb/ -p 4433
+                  -c :${C_ID} -H 1 -v)
         options+=(-V tls1.3:tls1.3)
         if [[ $G_NSS ]]; then
             options+=(-I $G_NSS)
         fi
         if [[ $sess_type == ' resume' ]]; then
             options+=(-u)
-        fi
-        if [[ $cert == rsa-pss ]]; then
-            options+=(-J rsa_pss_pss_sha256,rsa_pss_pss_sha384,rsa_pss_pss_sha512)
         fi
 
         # ecdsa certs require different option to specify used key
@@ -424,96 +415,50 @@ tls13interop_nss_openssl_test() {
         else
             options+=(-n $cert-server)
         fi
-        rlRun "expect $EXPECTS/nss-server.expect ${options[*]} >server.log 2>server.err &"
+        if [[ $cert = 'rsa-pss' ]]; then
+            options+=(-J rsa_pss_pss_sha256,rsa_pss_pss_sha384,rsa_pss_pss_sha512)
+        fi
+        rlRun "expect $EXPECTS/nss-server.expect ${options[*]} \
+               >server.log 2>server.err &"
         nss_pid=$!
         rlRun "rlWaitForSocket -d 0.1 4433 -p $nss_pid"
         [[ $DEBUG ]] && rlRun "rlWaitForFile -d 0.1 -p $tcpdump_pid capture.pcap"
 
-        options=(openssl s_client)
-        if [[ $sess_type == ' resume' ]]; then
-            options+=(-sess_out sess.pem)
-        fi
-        options+=(-CAfile $(x509Cert ca))
-        options+=(-connect localhost:4433)
-        options+=(-keylogfile openssl_keylog.txt)
-        options+=(-ciphersuites $C_OPENSSL)
-        if [[ -n $OPENSSL_SIG ]]; then
-            options+=(-sigalgs $OPENSSL_SIG)
+        options=(gnutls-cli)
+        options+=(--x509cafile $(x509Cert ca))
+        options+=(-p 4433 localhost)
+        if [[ $k_update == ' key update' ]]; then
+            options+=(--inline-commands)
         fi
         if [[ $g_type == ' HRR' ]]; then
-            options+=(-groups $G_OPENSSL_HRR)
-        elif [[ $G_OPENSSL ]]; then
-            options+=(-groups $G_OPENSSL)
+            options+=(--priority $GNUTLS_PRIO$GNUTLS_SIG$G_GNUTLS_HRR)
+            options+=(--single-key-share)
+        else
+            options+=(--priority $GNUTLS_PRIO$GNUTLS_SIG$G_GNUTLS)
+        fi
+        if [[ $sess_type == ' resume' ]]; then
+            # On RHEL 8.3, --waitresumption option was added to gnutls-cli (#1677754)
+            if rlIsRHEL '<8.3'; then
+                options+=(--resume)
+            else
+                options+=(--resume --waitresumption)
+            fi
         fi
 
-        if [[ $k_update == ' key update' ]]; then
-            rlRun "expect $EXPECTS/openssl-rekey.expect ${options[*]} \
+        if [[ $sess_type == ' resume' ]]; then
+            rlRun "expect $EXPECTS/gnutls-resume.expect  ${options[*]} \
                    &> client.log"
         else
-            rlRun "expect $EXPECTS/openssl-client.expect ${options[*]} \
+            rlRun "expect $EXPECTS/gnutls-client.expect ${options[*]} \
                    &> client.log"
         fi
 
         rlAssertGrep 'GET / HTTP/1.0' client.log
         rlAssertGrep 'Server: Generic Web Server' client.log
-        rlAssertGrep "Cipher is $C_OPENSSL" client.log
-
         if [[ $sess_type == ' resume' ]]; then
-            rlLogInfo 'Trying session resumption'
-            options=(openssl s_client)
-            options+=(-sess_in sess.pem)
-            options+=(-CAfile $(x509Cert ca))
-            options+=(-connect localhost:4433)
-            options+=(-keylogfile openssl_keylog.txt)
-            options+=(-ciphersuites $C_OPENSSL)
-            if [[ -n $OPENSSL_SIG ]]; then
-                options+=(-sigalgs $OPENSSL_SIG)
-            fi
-            if [[ $g_type == ' HRR' ]]; then
-                options+=(-groups $G_OPENSSL_HRR)
-            elif [[ $G_OPENSSL ]]; then
-                options+=(-groups $G_OPENSSL)
-            fi
-
-            if [[ $k_update == ' key update' ]]; then
-                rlRun "expect $EXPECTS/openssl-rekey.expect ${options[*]} &> client.log"
-            else
-                rlRun "expect $EXPECTS/openssl-client.expect ${options[*]} &> client.log"
-            fi
-
-            rlAssertGrep 'GET / HTTP/1.0' client.log
-            rlAssertGrep 'HTTP/1.0 200 OK' client.log
-            rlAssertGrep 'Reused, TLSv1.3' client.log
-
-            rlLogInfo 'Second resume'
-            options=(openssl s_client)
-            options+=(-sess_in sess.pem)
-            options+=(-CAfile $(x509Cert ca))
-            options+=(-connect localhost:4433)
-            options+=(-keylogfile openssl_keylog.txt)
-            options+=(-ciphersuites $C_OPENSSL)
-            if [[ -n $OPENSSL_SIG ]]; then
-                options+=(-sigalgs $OPENSSL_SIG)
-            fi
-            if [[ $g_type == ' HRR' ]]; then
-                options+=(-groups $G_OPENSSL_HRR)
-            elif [[ $G_OPENSSL ]]; then
-                options+=(-groups $G_OPENSSL)
-            fi
-
-            if [[ $k_update == ' key update' ]]; then
-                rlRun "expect $EXPECTS/openssl-rekey.expect ${options[*]} \
-                       &> client.log"
-            else
-                rlRun "expect $EXPECTS/openssl-client.expect ${options[*]} \
-                       &> client.log"
-            fi
-
-            rlAssertGrep 'GET / HTTP/1.0' client.log
-            rlAssertGrep 'HTTP/1.0 200 OK' client.log
-            rlAssertGrep 'Reused, TLSv1.3' client.log
+            rlAssertGrep 'Resume Handshake was completed' client.log
+            rlAssertGrep 'This is a resumed session' client.log
         fi
-
         rlRun "kill $nss_pid"
         rlRun "rlWait -s 9 $nss_pid" 0
         [[ $DEBUG ]] && rlRun "rlWait -s 9 $sleep_pid"
@@ -536,12 +481,14 @@ tls13interop_nss_openssl_test() {
 
     # NSS tools can't request or send KeyUpdate
     if [[ $k_update != ' key update' ]]; then
+
+        # strsclnt doesn't support setting supported sigalgs
         if [[ $tls13interop_no_phases ]]; then
             rlLogInfo "::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::"
-            rlLogInfo "::  OpenSSL server NSS client $C_OPENSSL cipher $cert client cert $c_sig sig_alg $g_name kex$g_type$sess_type$k_update"
+            rlLogInfo "::  GnuTLS server NSS client $c_name cipher $cert client cert $c_sig sig_alg $g_name kex$g_type$sess_type$k_update"
             rlLogInfo "::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::"
         else
-            rlPhaseStartTest "OpenSSL server NSS client $C_OPENSSL cipher $cert client cert $c_sig sig_alg $g_name kex$g_type$sess_type$k_update"
+            rlPhaseStartTest "GnuTLS server NSS client $c_name cipher $cert client cert $c_sig sig_alg $g_name kex$g_type$sess_type$k_update"
         fi
             rlLogInfo 'Prepare nss db for client'
             rlRun 'mkdir nssdb/'
@@ -557,31 +504,24 @@ tls13interop_nss_openssl_test() {
             [[ $DEBUG ]] && tcpdump_pid=$!
             [[ $DEBUG ]] && sleep 1.5 &
             [[ $DEBUG ]] && sleep_pid=$!
-            rlRun "openssl x509 -in $(x509Cert ca) -trustout -out trust.pem"
-            rlRun "cat $(x509Cert $cert-ca) >> trust.pem"
-            declare -a options=(openssl s_server -www)
-            options+=(-CAfile trust.pem)
-            options+=(-build_chain)
-            options+=(-cert $(x509Cert $cert-server))
-            options+=(-key $(x509Key $cert-server))
-            options+=(-ciphersuites $C_OPENSSL)
-            options+=(-keylogfile openssl_keylog.txt)
-            options+=(-ciphersuites $C_OPENSSL)
-            if [[ -n $OPENSSL_SIG ]]; then
-                options+=(-client_sigalgs $OPENSSL_SIG)
-            fi
-            options+=(-Verify 3)
-            rlRun "${options[*]} >server.log 2>server.err &"
-            openssl_pid=$!
-            rlRun "rlWaitForSocket -d 0.1 4433 -p $openssl_pid"
+            options=(--http -p 4433)
+            options+=(--x509keyfile $(x509Key $cert-server))
+            options+=(--x509certfile '<(cat $(x509Cert ${cert}-server) $(x509Cert ${cert}-ca))')
+            options+=(--x509cafile '<(cat $(x509Cert ca) $(x509Cert ${cert}-ca))')
+            options+=(--priority $GNUTLS_PRIO$GNUTLS_SIG$G_GNUTLS)
+            options+=(--require-client-cert --verify-client-cert)
+            rlRun "gnutls-serv ${options[*]} >server.log 2>server.err &"
+            gnutls_pid=$!
+            rlRun "rlWaitForSocket -d 0.1 4433 -p $gnutls_pid"
+
             [[ $DEBUG ]] && rlRun "rlWaitForFile -d 0.1 -p $tcpdump_pid capture.pcap"
             if [[ $sess_type == ' resume' ]]; then
-                options=($STRSCLNT_UTIL)
+                options=(${STRSCLNT_UTIL})
                 options+=(-c 10 -P 20)
                 options+=(-p 4433)
                 options+=(-C :${C_ID})
             else
-                options=($CLIENT_UTIL)
+                options=(${CLIENT_UTIL})
                 options+=(-h localhost -p 4433)
                 options+=(-c :${C_ID})
             fi
@@ -610,17 +550,16 @@ tls13interop_nss_openssl_test() {
             fi
 
             if [[ $sess_type == ' resume' ]]; then
-                # waiving the bug 1731182, normally it should be
-                # "8 cache hits" and "8 stateless resumes"
-                rlAssertGrep '[12345678] cache hits' client.log -E
-                rlAssertGrep '[12345678] stateless resumes' client.log -E
+                # waiving bug 1731182
+                # normally it should be "8 cache hits" and "8 stateless resumes"
+                rlAssertGrep '[12345678] cache hits' 'client.log' -E
+                rlAssertGrep '[12345678] stateless resumes' 'client.log' -E
             else
-                rlAssertGrep 'GET / HTTP/1.0' client.log
-                rlAssertGrep 'HTTP/1.0 200 ok' client.log
-                rlAssertGrep "$C_OPENSSL" client.log
+                # rlAssertGrep 'GET / HTTP/1.0' client.log  # can get torn apart
+                rlAssertGrep 'HTTP/1.0 200 OK' client.log
             fi
-            rlRun "kill $openssl_pid"
-            rlRun "rlWait -s 9 $openssl_pid" 143
+            rlRun "kill $gnutls_pid"
+            rlRun "rlWait -s 9 $gnutls_pid" 1
             [[ $DEBUG ]] && rlRun "rlWait -s 9 $sleep_pid"
             [[ $DEBUG ]] && rlRun "kill $tcpdump_pid"
             [[ $DEBUG ]] && rlRun "rlWait -s 9 $tcpdump_pid"
@@ -642,10 +581,10 @@ tls13interop_nss_openssl_test() {
 
     if [[ $tls13interop_no_phases ]]; then
         rlLogInfo "::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::"
-        rlLogInfo "::  NSS server OpenSSL client $C_OPENSSL cipher $cert client cert $c_sig sig_alg $g_name kex$g_type$sess_type$k_update"
+        rlLogInfo "::  NSS server GnuTLS client $c_name cipher $cert client cert $c_sig sig_alg $g_name kex$g_type$sess_type$k_update"
         rlLogInfo "::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::"
     else
-        rlPhaseStartTest "NSS server OpenSSL client $C_OPENSSL cipher $cert client cert $c_sig sig_alg $g_name kex$g_type$sess_type$k_update"
+        rlPhaseStartTest "NSS server GnuTLS client $c_name cipher $cert client cert $c_sig sig_alg $g_name kex$g_type$sess_type$k_update"
     fi
         [[ $DEBUG ]] && rlRun 'tcpdump -i lo -B 1024 -s 0 -U -w capture.pcap port 4433 &'
         [[ $DEBUG ]] && tcpdump_pid=$!
@@ -660,11 +599,12 @@ tls13interop_nss_openssl_test() {
 
         rlLogInfo 'Test proper'
         declare -a options=()
-        options+=($SERVER_UTIL)
+        options+=(${SERVER_UTIL})
         options+=(-d sql:./nssdb/)
         options+=(-p 4433)
         options+=(-c :${C_ID} -H 1)
         options+=(-rr)
+        options+=(-v)
         options+=(-V tls1.3:tls1.3)
         if [[ $G_NSS ]]; then
             options+=(-I $G_NSS)
@@ -672,128 +612,58 @@ tls13interop_nss_openssl_test() {
         if [[ $sess_type == ' resume' ]]; then
             options+=(-u)
         fi
-        if [[ $cert == rsa-pss ]]; then
-            options+=(-J rsa_pss_pss_sha256,rsa_pss_pss_sha384,rsa_pss_pss_sha512)
-        fi
 
         # ecdsa certs require different option to specify used key
-        if [[ $cert =~ 'ecdsa' ]]; then
+        if [[ ${cert} =~ 'ecdsa' ]]; then
             options+=(-e ${cert}-server)
         else
             options+=(-n ${cert}-server)
         fi
-        rlRun "expect $EXPECTS/nss-server.expect ${options[*]} \
-               >server.log 2>server.err &"
+        if [[ ${cert} == 'rsa-pss' ]]; then
+            options+=(-J rsa_pss_pss_sha256,rsa_pss_pss_sha384,rsa_pss_pss_sha512)
+        fi
+        rlRun "expect $EXPECTS/nss-server.expect \
+                   ${options[*]} >server.log 2>server.err &"
         nss_pid=$!
         rlRun "rlWaitForSocket -d 0.1 4433 -p $nss_pid"
         [[ $DEBUG ]] && rlRun "rlWaitForFile -d 0.1 -p $tcpdump_pid capture.pcap"
-
-        options=(openssl s_client)
-        if [[ $sess_type == ' resume' ]]; then
-            options+=(-sess_out sess.pem)
-        fi
-        options+=(-CAfile $(x509Cert ca))
-        options+=(-key $(x509Key ${cert}-client))
-        options+=(-cert $(x509Cert ${cert}-client))
-        options+=(-connect localhost:4433)
-        options+=(-keylogfile openssl_keylog.txt)
-        options+=(-ciphersuites $C_OPENSSL)
-        if [[ -n $OPENSSL_SIG ]]; then
-            options+=(-sigalgs $OPENSSL_SIG)
-        fi
+        options=(gnutls-cli)
+        options+=(--x509cafile '<(cat $(x509Cert ca) $(x509Cert ${cert}-ca))')
+        options+=(-p 4433 localhost)
+        options+=(--x509certfile $(x509Cert ${cert}-client))
+        options+=(--x509keyfile $(x509Key ${cert}-client))
         if [[ $g_type == ' HRR' ]]; then
-            options+=(-groups $G_OPENSSL_HRR)
-        elif [[ $G_OPENSSL ]]; then
-            options+=(-groups $G_OPENSSL)
+            options+=(--priority $GNUTLS_PRIO$GNUTLS_SIG$G_GNUTLS_HRR)
+            options+=(--single-key-share)
+        else
+            options+=(--priority $GNUTLS_PRIO$GNUTLS_SIG$G_GNUTLS)
+        fi
+        if [[ $sess_type == ' resume' ]]; then
+            # On RHEL 8.3, --waitresumption option was added to gnutls-cli (#1677754)
+            if rlIsRHEL '<8.3'; then
+                options+=(--resume)
+            else
+                options+=(--resume --waitresumption)
+            fi
+        fi
+        if [[ $k_update == ' key update' ]]; then
+            options+=(--inline-commands)
         fi
 
-        if [[ $k_update == ' key update' ]]; then
-            rlRun "expect $EXPECTS/openssl-rekey.expect ${options[*]} \
-                   &> client.log"
+        if [[ $sess_type == ' resume' ]]; then
+            rlRun "expect $EXPECTS/gnutls-resume.expect \
+                       ${options[*]} &> client.log"
         else
-            rlRun "expect $EXPECTS/openssl-client.expect ${options[*]} \
-                   &> client.log"
+            rlRun "expect $EXPECTS/gnutls-client.expect \
+                       ${options[*]} &> client.log"
         fi
 
         rlAssertGrep 'GET / HTTP/1.0' client.log
-        rlAssertGrep 'HTTP/1.0 200 OK' client.log
-        rlAssertGrep "Cipher is $C_OPENSSL" client.log
-        rlGetPhaseState
-        if [[ $ECODE -gt $START_ECODE ]]; then
-            rlRun 'cat server.log' 0 'Server stdout'
-            rlRun 'cat server.err' 0 'Server stderr'
-            rlRun 'cat client.log' 0 'Client output'
-            [[ $DEBUG == 'shell' ]] && bash
-        fi
-
+        rlAssertGrep 'Server: Generic Web Server' client.log
         if [[ $sess_type == ' resume' ]]; then
-            rlLogInfo 'Trying session resumption'
-            options=(openssl s_client)
-            options+=(-sess_in sess.pem)
-            options+=(-CAfile $(x509Cert ca))
-            options+=(-connect localhost:4433)
-            options+=(-keylogfile openssl_keylog.txt)
-            options+=(-key $(x509Key ${cert}-client))
-            options+=(-cert $(x509Cert ${cert}-client))
-            options+=(-ciphersuites $C_OPENSSL)
-            if [[ -n $OPENSSL_SIG ]]; then
-                options+=(-sigalgs $OPENSSL_SIG)
-            fi
-            if [[ $g_type == ' HRR' ]]; then
-                options+=(-groups $G_OPENSSL_HRR)
-            elif [[ $G_OPENSSL ]]; then
-                options+=(-groups $G_OPENSSL)
-            fi
-
-            if [[ $k_update == ' key update' ]]; then
-                rlRun "expect $EXPECTS/openssl-rekey.expect ${options[*]} \
-                       &> client.log"
-            else
-                rlRun "expect $EXPECTS/openssl-client.expect ${options[*]} \
-                       &> client.log"
-            fi
-
-            rlAssertGrep 'GET / HTTP/1.0' client.log
-            rlAssertGrep 'HTTP/1.0 200 OK' client.log
-            rlAssertGrep 'Reused, TLSv1.3' client.log
-            rlGetPhaseState
-            if [[ $ECODE -gt $START_ECODE ]]; then
-                rlRun 'cat server.log' 0 'Server stdout'
-                rlRun 'cat server.err' 0 'Server stderr'
-                rlRun 'cat client.log' 0 'Client output'
-                [[ $DEBUG == 'shell' ]] && bash
-            fi
-            rlLogInfo 'Second resume'
-            options=(openssl s_client)
-            options+=(-sess_in sess.pem)
-            options+=(-CAfile $(x509Cert ca))
-            options+=(-key $(x509Key ${cert}-client))
-            options+=(-cert $(x509Cert ${cert}-client))
-            options+=(-connect localhost:4433)
-            options+=(-keylogfile openssl_keylog.txt)
-            options+=(-ciphersuites $C_OPENSSL)
-            if [[ -n $OPENSSL_SIG ]]; then
-                options+=(-sigalgs $OPENSSL_SIG)
-            fi
-            if [[ $g_type == ' HRR' ]]; then
-                options+=(-groups $G_OPENSSL_HRR)
-            elif [[ $G_OPENSSL ]]; then
-                options+=(-groups $G_OPENSSL)
-            fi
-
-            if [[ $k_update == ' key update' ]]; then
-                rlRun "expect $EXPECTS/openssl-rekey.expect ${options[*]} \
-                       &> client.log"
-            else
-                rlRun "expect $EXPECTS/openssl-client.expect ${options[*]} \
-                       &> client.log"
-            fi
-
-            rlAssertGrep 'GET / HTTP/1.0' client.log
-            rlAssertGrep 'HTTP/1.0 200 OK' client.log
-            rlAssertGrep 'Reused, TLSv1.3' client.log
+            rlAssertGrep 'Resume Handshake was completed' client.log
+            rlAssertGrep 'This is a resumed session' client.log
         fi
-
         rlRun "kill $nss_pid"
         rlRun "rlWait -s 9 $nss_pid" 0
         [[ $DEBUG ]] && rlRun "rlWait -s 9 $sleep_pid"
@@ -813,20 +683,21 @@ tls13interop_nss_openssl_test() {
     else
         rlPhaseEnd
     fi
+
     unset SSLKEYLOGFILE
 }
 
 
-tls13interop_nss_openssl_cleanup() {
+tls13interop_gnutls_nss_cleanup() {
     if rlIsRHEL '<8.1' && ! $FIPS; then
         rlRun 'rlFileRestore'
     fi
 }
 
-tls13interop_nss_openssl_test_all_for_cert() { local cert=$1
-    for c_name in "${tls13interop_nss_openssl_CIPHER_NAMES[@]}"; do
+tls13interop_gnutls_nss_test_all_for_cert() { local cert=$1
+    for c_name in "${tls13interop_gnutls_nss_CIPHER_NAMES[@]}"; do
      for c_sig in 'default' 'SHA256' 'SHA384' 'SHA512'; do
-      for g_name in "${tls13interop_nss_openssl_GROUP_NAMES[@]}"; do
+      for g_name in "${tls13interop_gnutls_nss_GROUP_NAMES[@]}"; do
        for g_type in '' ' HRR'; do
         for sess_type in '' ' resume'; do
          for k_update in '' ' key update'; do
@@ -850,7 +721,7 @@ tls13interop_nss_openssl_test_all_for_cert() { local cert=$1
               continue
           fi
 
-          tls13interop_nss_openssl_test \
+          tls13interop_gnutls_nss_test \
               "$cert" "$c_name" "$c_sig" "$g_name" \
               "$g_type" "$sess_type" "$k_update"
 
@@ -863,8 +734,8 @@ tls13interop_nss_openssl_test_all_for_cert() { local cert=$1
 }
 
 
-tls13interop_nss_openssl_test_all() {
+tls13interop_gnutls_nss_test_all() {
     for cert in 'rsa' 'rsa-pss' 'ecdsa-p256' 'ecdsa-p384' 'ecdsa-p521'; do
-        tls13interop_nss_openssl_test_all_for_cert $cert
+        tls13interop_gnutls_nss_test_all_for_cert $cert
     done
 }

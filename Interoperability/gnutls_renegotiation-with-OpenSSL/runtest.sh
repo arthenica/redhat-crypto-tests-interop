@@ -35,7 +35,7 @@ PACKAGES="gnutls openssl"
 rlJournalStart
     rlPhaseStartSetup
         rlAssertRpm --all
-        rlRun "rlImport fips"
+        rlRun "rlImport distribution/fips"
         fipsIsEnabled
         fips=$?
         if [[ $fips -eq 2 ]]; then

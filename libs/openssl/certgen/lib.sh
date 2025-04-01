@@ -3047,7 +3047,7 @@ This library works correctly only when sourced. I.e.:
 or imported using rlImport inside the beakerlib, i.e. after running
 
     . /usr/share/beakerlib/beakerlib.sh
-    rlRun "rlImport certgen"
+    rlRun "rlImport openssl/certgen"
 
 =over
 

@@ -38,7 +38,7 @@ rlJournalStart
     rlPhaseStartSetup
         rlAssertRpm --all
 
-        rlRun "rlImport fips"
+        rlRun "rlImport distribution/fips"
         if ( ! rlIsRHEL '<9' ) && ( ! rlIsFedora); then
             TWAY="${TWAY}-9.0"
         fi
@@ -48,7 +48,7 @@ rlJournalStart
             TWAY_CSV=${TWAY}.fips.csv
         fi
 
-        rlRun "rlImport tls-1-3-interoperability-nss-openssl"
+        rlRun "rlImport openssl/tls-1-3-interoperability-nss-openssl"
         rlRun "TmpDir=\$(mktemp -d)" 0 "Creating tmp directory"
         TEST_DIR=$(pwd)
         rlRun "pushd $TmpDir"

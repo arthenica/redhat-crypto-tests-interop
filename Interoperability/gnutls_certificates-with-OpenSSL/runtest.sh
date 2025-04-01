@@ -35,8 +35,8 @@ PACKAGES="openssl gnutls"
 rlJournalStart
     rlPhaseStartSetup
         rlAssertRpm --all
-        rlRun "rlImport certgen"
-        rlRun "rlImport fips"
+        rlRun "rlImport openssl/certgen"
+        rlRun "rlImport distribution/fips"
         rlRun "TmpDir=\$(mktemp -d)" 0 "Creating tmp directory"
         rlRun "cp server.tpl ca.tpl $TmpDir"
         rlRun "pushd $TmpDir"
