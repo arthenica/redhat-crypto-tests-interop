@@ -324,6 +324,10 @@ function fipsIsEnabled {
             ret_val=1;
         fi
 
+    elif grep -q "ID=ubuntu" /etc/os-release; then
+
+        ret_val=1
+
     else
         rlLogError "Unsupported distro!"
     fi
