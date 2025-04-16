@@ -438,7 +438,7 @@ tls13interop_gnutls_nss_test() {
         fi
         if [[ $sess_type == ' resume' ]]; then
             # On RHEL 8.3, --waitresumption option was added to gnutls-cli (#1677754)
-            if rlIsRHEL '<8.3'; then
+            if ! rlIsRHEL || rlIsRHEL '<8.3'; then
                 options+=(--resume)
             else
                 options+=(--resume --waitresumption)
@@ -640,7 +640,7 @@ tls13interop_gnutls_nss_test() {
         fi
         if [[ $sess_type == ' resume' ]]; then
             # On RHEL 8.3, --waitresumption option was added to gnutls-cli (#1677754)
-            if rlIsRHEL '<8.3'; then
+            if ! rlIsRHEL || rlIsRHEL '<8.3'; then
                 options+=(--resume)
             else
                 options+=(--resume --waitresumption)

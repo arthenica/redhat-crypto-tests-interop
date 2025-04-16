@@ -1,0 +1,22 @@
+diff --git a/Library/tls-1-3-interoperability-gnutls-nss/lib.sh b/Library/tls-1-3-interoperability-gnutls-nss/lib.sh
+index 56839d7..9ccbd40 100644
+--- a/Library/tls-1-3-interoperability-gnutls-nss/lib.sh
++++ b/Library/tls-1-3-interoperability-gnutls-nss/lib.sh
+@@ -438,7 +438,7 @@ tls13interop_gnutls_nss_test() {
+         fi
+         if [[ $sess_type == ' resume' ]]; then
+             # On RHEL 8.3, --waitresumption option was added to gnutls-cli (#1677754)
+-            if rlIsRHEL '<8.3'; then
++            if ! rlIsRHEL || rlIsRHEL '<8.3'; then
+                 options+=(--resume)
+             else
+                 options+=(--resume --waitresumption)
+@@ -640,7 +640,7 @@ tls13interop_gnutls_nss_test() {
+         fi
+         if [[ $sess_type == ' resume' ]]; then
+             # On RHEL 8.3, --waitresumption option was added to gnutls-cli (#1677754)
+-            if rlIsRHEL '<8.3'; then
++            if ! rlIsRHEL || rlIsRHEL '<8.3'; then
+                 options+=(--resume)
+             else
+                 options+=(--resume --waitresumption)
