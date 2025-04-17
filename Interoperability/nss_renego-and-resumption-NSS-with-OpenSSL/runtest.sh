@@ -68,7 +68,7 @@ rlJournalStart
             echo -e 'cipher = AES-128-CBC+ AES-256-CBC+\n mac = HMAC-SHA1+' \
                 > /etc/crypto-policies/policies/modules/UNFIPS.pmod
             rlRun 'update-crypto-policies --set FIPS:UNFIPS'
-        elif ! rlIsRHEL '<8' && [[ $_fips -eq 1 ]]; then
+        elif rlIsOS "ubuntu" || ( ! rlIsRHEL '<8' && [[ $_fips -eq 1 ]] ); then
             # we're checking for interoperability so we need to enable
             # everything supported
             # (unless we're in FIPS mode, then we can't touch policy files)
@@ -580,7 +580,7 @@ rlJournalStart
             options+=(-cert ${C_CERT[$j]})
             options+=(-CAfile '<(cat $(x509Cert ca) ${C_SUBCA[$j]})')
             options+=(-cipher ${C_OPENSSL[$j]})
-            if ! rlIsRHEL '<9'; then
+            if rlIsRHELLike && ! rlIsRHEL '<9'; then
                 options+=(-client_renegotiation)
             fi
             if [[ $(echo ${C_NAME[$j]}  | awk -F"_" '{print $2}') == "DHE" ]] && fipsIsEnabled; then
@@ -631,7 +631,7 @@ rlJournalStart
             options+=(-CAfile '<(cat $(x509Cert ca) ${C_SUBCA[$j]})')
             options+=(-cipher ${C_OPENSSL[$j]})
             options+=(-Verify 1 -verify_return_error)
-            if ! rlIsRHEL '<9'; then
+            if rlIsRHELLike && ! rlIsRHEL '<9'; then
                 options+=(-client_renegotiation)
             fi
             if [[ $(echo ${C_NAME[$j]}  | awk -F"_" '{print $2}') == "DHE" ]] && fipsIsEnabled; then
