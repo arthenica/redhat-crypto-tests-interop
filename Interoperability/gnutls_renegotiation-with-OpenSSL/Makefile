@@ -55,6 +55,7 @@ $(METADATA): Makefile
 	@echo "TestTime:        10m" >> $(METADATA)
 	@echo "RunFor:          gnutls openssl" >> $(METADATA)
 	@echo "Requires:        gnutls gnutls-utils openssl" >> $(METADATA)
+	@echo "Requires:        crypto-policies-scripts" >> $(METADATA)
 	@echo "Priority:        Normal" >> $(METADATA)
 	@echo "License:         GPLv2" >> $(METADATA)
 	@echo "Confidential:    no" >> $(METADATA)

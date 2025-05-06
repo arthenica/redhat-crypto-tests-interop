@@ -10,6 +10,7 @@ recommend:
   - gnutls
   - gnutls-utils
   - openssl
+  - crypto-policies-scripts
 duration: 10m
 enabled: true
 tag:
