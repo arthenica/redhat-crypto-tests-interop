@@ -268,15 +268,13 @@ tls13interop_gnutls_nss_test() {
     local GNUTLS_PRIO="NORMAL:+VERS-TLS1.3"
     local EXPECTS=$tls13interop_gnutls_nss_EXPECTS
     export SSLKEYLOGFILE='nss_log_file.txt'
-    local SERVER_UTIL='/usr/lib/nss/unsupported-tools/selfserv'
-    local CLIENT_UTIL='/usr/lib/nss/unsupported-tools/tstclnt'
-    local STRSCLNT_UTIL='/usr/lib/nss/unsupported-tools/strsclnt'
-    [ -f /usr/lib64/nss/unsupported-tools/selfserv ] && \
-        SERVER_UTIL='/usr/lib64/nss/unsupported-tools/selfserv'
-    [ -f /usr/lib64/nss/unsupported-tools/tstclnt ] && \
-        CLIENT_UTIL='/usr/lib64/nss/unsupported-tools/tstclnt'
-    [ -f /usr/lib64/nss/unsupported-tools/strsclnt ] && \
-        STRSCLNT_UTIL='/usr/lib64/nss/unsupported-tools/strsclnt'
+    PATHS_UTIL=(
+        /usr/lib64/nss/unsupported-tools
+        /usr/lib/nss/unsupported-tools
+        )
+    SERVER_UTIL=${SERVER_UTIL:-$(find ${PATHS_UTIL[@]} -name selfserv -print -quit)}
+    CLIENT_UTIL=${CLIENT_UTIL:-$(find ${PATHS_UTIL[@]} -name tstclnt -print -quit)}
+    STRSCLNT_UTIL=${STRSCLNT_UTIL:-$(find ${PATHS_UTIL[@]} -name strsclnt -print -quit)}
 
     local C_GNUTLS C_OPENSSL C_ID
     read C_GNUTLS C_OPENSSL C_ID \
