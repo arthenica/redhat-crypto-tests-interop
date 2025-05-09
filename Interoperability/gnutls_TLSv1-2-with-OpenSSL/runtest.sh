@@ -63,11 +63,13 @@ rlJournalStart
             if [[ $fips -ne 0 ]]; then
                 current_policy=$(update-crypto-policies --show)
                 rlRun "update-crypto-policies --set LEGACY"
-                openssl_config=$(readlink /etc/crypto-policies/back-ends/openssl.config)
-                rlRun "rlFileBackup $openssl_config"
+                if rlIsRHEL '<10.1'; then
+                    openssl_config=$(readlink /etc/crypto-policies/back-ends/openssl.config)
+                    rlRun "rlFileBackup $openssl_config"
+                    rlRun "sed -i 's/-CAMELLIA/CAMELLIA/g' $openssl_config"
+                fi
                 opensslcnf_config=$(readlink /etc/crypto-policies/back-ends/opensslcnf.config)
                 rlRun "rlFileBackup $opensslcnf_config"
-                rlRun "sed -i 's/-CAMELLIA/CAMELLIA/g' $openssl_config"
                 rlRun "sed -i 's/-CAMELLIA/CAMELLIA/g' $opensslcnf_config"
                 if ! rlIsRHEL '<9'; then
                     # while we don't support TLS 1.1 even in LEGACY in RHEL-9
