@@ -57,7 +57,7 @@ rlJournalStart
         rlRun "certutil -L -d sql:nssdb"
 
         # Since RHEL-8 we need LEGACY policy to test TLS 1.1
-        if ! rlIsRHEL "<8"; then
+        if rlIsRHEL && ! rlIsRHEL "<8"; then
             CRYPTO_POLICY=$(update-crypto-policies --show)
             rlRun "update-crypto-policies --set LEGACY"
         fi
@@ -109,7 +109,7 @@ rlJournalStart
     rlPhaseEnd
 
     rlPhaseStartCleanup
-        if ! rlIsRHEL "<8"; then
+        if rlIsRHEL && ! rlIsRHEL "<8"; then
             rlRun "update-crypto-policies --set $CRYPTO_POLICY"
         fi
         rlRun "popd"
