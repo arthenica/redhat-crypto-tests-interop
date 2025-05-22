@@ -51,7 +51,7 @@ rlJournalStart
         # policy on RHEL-8. If FIPS mode is set, we should not touch
         # policy though.
         GNUTLS_PRIO="NORMAL"
-        if ! rlIsRHEL '<8' && [ $_fips -ne 0 ]; then
+        if (rlIsRHELLike || rlIsFedora) && ! rlIsRHEL '<8' && [ $_fips -ne 0 ]; then
             rlRun "rlFileBackup /etc/crypto-policies/config"
             rlRun "echo LEGACY > /etc/crypto-policies/config"
             rlRun "update-crypto-policies"
@@ -673,7 +673,7 @@ rlJournalStart
     done
 
     rlPhaseStartCleanup
-        if ! rlIsRHEL '<8' && [ $_fips -ne 0 ]; then
+        if (rlIsRHELLike || rlIsFedora) && ! rlIsRHEL '<8' && [ $_fips -ne 0 ]; then
             rlRun "rlFileRestore"
             rlRun "update-crypto-policies"
         elif rlIsRHEL '7' && rlIsRHEL '>=7.7'; then
