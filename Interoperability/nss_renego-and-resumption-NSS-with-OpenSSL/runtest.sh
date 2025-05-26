@@ -32,12 +32,13 @@
 PACKAGE="nss"
 PACKAGES="nss openssl"
 
-SERVER_UTIL="/usr/lib64/nss/unsupported-tools/selfserv"
-CLIENT_UTIL="/usr/lib64/nss/unsupported-tools/tstclnt"
-STRSCLNT_UTIL="/usr/lib64/nss/unsupported-tools/strsclnt"
-[ ! -f $SERVER_UTIL ] && SERVER_UTIL="/usr/lib/nss/unsupported-tools/selfserv"
-[ ! -f $CLIENT_UTIL ] && CLIENT_UTIL="/usr/lib/nss/unsupported-tools/tstclnt"
-[ ! -f $STRSCLNT_UTIL ] && STRSCLNT_UTIL="/usr/lib/nss/unsupported-tools/strsclnt"
+PATHS_UTIL=(
+    /usr/lib64/nss/unsupported-tools
+    /usr/lib/nss/unsupported-tools
+    )
+SERVER_UTIL=${SERVER_UTIL:-$(find ${PATHS_UTIL[@]} -name selfserv -print -quit)}
+CLIENT_UTIL=${CLIENT_UTIL:-$(find ${PATHS_UTIL[@]} -name tstclnt -print -quit)}
+STRSCLNT_UTIL=${STRSCLNT_UTIL:-$(find ${PATHS_UTIL[@]} -name strsclnt -print -quit)}
 
 NSS_POLICY="/etc/crypto-policies/back-ends/nss.config"
 

@@ -32,10 +32,12 @@
 PACKAGE="nss"
 PACKAGES="nss openssl"
 
-SERVER_UTIL="/usr/lib/nss/unsupported-tools/selfserv"
-CLIENT_UTIL="/usr/lib/nss/unsupported-tools/tstclnt"
-[ -f /usr/lib64/nss/unsupported-tools/selfserv ] && SERVER_UTIL="/usr/lib64/nss/unsupported-tools/selfserv"
-[ -f /usr/lib64/nss/unsupported-tools/tstclnt ] && CLIENT_UTIL="/usr/lib64/nss/unsupported-tools/tstclnt"
+PATHS_UTIL=(
+    /usr/lib64/nss/unsupported-tools
+    /usr/lib/nss/unsupported-tools
+    )
+SERVER_UTIL=${SERVER_UTIL:-$(find ${PATHS_UTIL[@]} -name selfserv -print -quit)}
+CLIENT_UTIL=${CLIENT_UTIL:-$(find ${PATHS_UTIL[@]} -name tstclnt -print -quit)}
 
 rlJournalStart
     rlPhaseStartSetup
