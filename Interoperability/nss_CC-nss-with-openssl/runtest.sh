@@ -55,7 +55,7 @@ rlJournalStart
         rlRun "pushd $TmpDir"
         # we are testing interoperability, not default settings, so turn on
         # everything that's CC compatible
-        if ! rlIsRHEL '<8'; then
+        if (rlIsRHELLike || rlIsFedora ) && ! rlIsRHEL '<8'; then
             if [[ $fips -eq 1 ]]; then
                 old_policy=$(update-crypto-policies --show)
                 rlRun "update-crypto-policies --set LEGACY"
