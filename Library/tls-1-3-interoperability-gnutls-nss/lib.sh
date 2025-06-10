@@ -249,6 +249,7 @@ tls13interop_gnutls_nss_test() {
     local g_name=$4 g_type=$5 sess_type=$6 k_update=$7
     rlGetPhaseState
     local START_ECODE=$ECODE
+    START_ECODE=$((ECODE-1)) # print logs even if it went well
 
 
     if [[ $g_type == ' HRR' && $g_name == 'default' ]]; then
