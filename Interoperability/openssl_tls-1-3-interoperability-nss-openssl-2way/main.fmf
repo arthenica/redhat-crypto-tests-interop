@@ -6,6 +6,10 @@ component:
   - openssl
 test: ./runtest.sh
 framework: beakerlib
+require:
+  - library(openssl/certgen)
+  - library(distribution/fips)
+  - library(openssl/tls-1-3-interoperability-nss-openssl)
 recommend:
   - expect
   - nss

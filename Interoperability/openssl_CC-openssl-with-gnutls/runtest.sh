@@ -4,7 +4,7 @@
 #
 #   runtest.sh of /CoreOS/openssl/Interoperability/CC-openssl-with-gnutls
 #   Description: Test CC relevant ciphers with openssl and gnutls
-#   Author: Hubert Kario <hkario@redhat.com>
+#   Author: Alicja Kario <hkario@redhat.com>
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
@@ -35,11 +35,9 @@ PACKAGES="openssl gnutls"
 rlJournalStart
     rlPhaseStartSetup
         rlAssertRpm --all
-        rlRun "rlImport certgen"
-        rlRun "rlImport fips"
-        fipsIsEnabled
-        fips=$?
-        if [[ $fips -eq 2 ]]; then
+        rlRun "rlImport openssl/certgen"
+        rlRun "rlImport distribution/fips"
+        if [[ $fipsMode != 'enabled' && $fipsMode != 'disabled' ]]; then
             rlDie "FIPS mode misconfigured"
             exit 1
         fi
@@ -52,7 +50,7 @@ rlJournalStart
         # we want to test the deprecated TLS 1.1 ciphers too
         # so enable LEGACY policy
         if ! rlIsRHEL '<8'; then
-            if [[ $fips -eq 1 ]]; then
+            if [[ $fipsMode == 'disabled' ]]; then
                 policy=$(update-crypto-policies --show)
                 rlRun "update-crypto-policies --set LEGACY"
             fi
@@ -62,7 +60,7 @@ rlJournalStart
             fi
         fi
         # we want to test CBC in FIPS in RHEL 9 despite c-p disabling it
-        if fipsIsEnabled && rlIsRHEL && ! rlIsRHEL '<9'; then
+        if [[ $fipsMode == 'enabled' ]] && rlIsRHEL && ! rlIsRHEL '<9'; then
             policy=$(update-crypto-policies --show)
             rlRun "rlFileBackup --clean /etc/crypto-policies/policies/modules"
             echo -e 'cipher = AES-128-CBC+ AES-256-CBC+\n mac = HMAC-SHA1+' \
@@ -92,7 +90,7 @@ rlJournalStart
         rlRun "x509DumpCert ecdsa-client" 0 "Client ECDSA certificate"
         # we won't be using them on RHEL-8 in FIPS mode
         # as DSA is not supported in FIPS mode
-        if ! (! rlIsRHEL '<8' && [[ $fips -eq 0 ]]); then
+        if ! (! rlIsRHEL '<8' && [[ $fipsMode == 'enabled' ]]); then
             rlRun "x509KeyGen -t dsa dsa-ca"
             rlRun "x509KeyGen -t dsa dsa-server"
             rlRun "x509KeyGen -t dsa dsa-client"
@@ -104,7 +102,7 @@ rlJournalStart
             rlRun "x509DumpCert dsa-client" 0 "Client DSA certificate"
         fi
         # or on RHEL-9
-        if [[ $fips -eq 1 ]] && rlIsRHEL '<9'; then
+        if [[ $fipsMode == 'disabled' ]] && rlIsRHEL '<9'; then
             # --conservative is as a workaround for RHBZ# 1238279 & 1238290
             rlRun "x509KeyGen -t dsa --conservative -s 1024 1024dsa-ca"
             rlRun "x509KeyGen -t dsa --conservative -s 1024 1024dsa-server"
@@ -150,7 +148,7 @@ rlJournalStart
         #
 
         # FIPS mode in RHEL-8 does not allow RSA key exchange
-        if ! (! rlIsRHEL '<8' && [[ $fips -eq 0 ]] ); then
+        if ! (! rlIsRHEL '<8' && [[ $fipsMode == 'enabled' ]] ); then
             # RHEL-9 disables 3DES
             if rlIsRHEL '<9'; then
                 C_NAME[$i]="TLS_RSA_WITH_3DES_EDE_CBC_SHA"
@@ -238,7 +236,7 @@ rlJournalStart
 
         # 3DES is not allowed in RHEL-8 in FIPS mode
         # or in RHEL-9 in general
-        if ! (rlIsRHEL '8' && [[ $fips -eq 0 ]] ) && rlIsRHEL '<9'; then
+        if ! (rlIsRHEL '8' && [[ $fipsMode == 'enabled' ]] ) && rlIsRHEL '<9'; then
             C_NAME[$i]="TLS_DHE_RSA_WITH_3DES_EDE_CBC_SHA"
             C_OPENSSL[$i]="EDH-RSA-DES-CBC3-SHA"
             C_ID[$i]="0016"
@@ -322,7 +320,7 @@ rlJournalStart
         #
 
         # DSS/DSA is disabled in RHEL-9
-        if ! fipsIsEnabled && rlIsRHEL '<9'; then
+        if [[ $fipsMode == 'disabled' ]] && rlIsRHEL '<9'; then
             # since 2048bit DSA is undefined for TLS1.1, use 1024bit DSA
             # for cipher suites which can be used in TLS1.1, RHBZ#1238333
             C_NAME[$i]="TLS_DHE_DSS_WITH_3DES_EDE_CBC_SHA"
@@ -361,7 +359,7 @@ rlJournalStart
 
         # DSA is not allowed in FIPS mode on RHEL-8
         # or in RHEL-9
-        if ! (! rlIsRHEL '<8' && [[ $fips -eq 0 ]] ) && rlIsRHEL '<9'; then
+        if ! (! rlIsRHEL '<8' && [[ $fipsMode == 'enabled' ]] ) && rlIsRHEL '<9'; then
             C_NAME[$i]="TLS_DHE_DSS_WITH_AES_128_CBC_SHA256"
             C_OPENSSL[$i]="DHE-DSS-AES128-SHA256"
             C_ID[$i]="0040"
@@ -413,7 +411,7 @@ rlJournalStart
 
         # 3DES is not allowed in RHEL-8 in FIPS mode
         # or in RHEL-9
-        if ! (! rlIsRHEL '<8' && [[ $fips -eq 0 ]] ) && rlIsRHEL '<9'; then
+        if ! (! rlIsRHEL '<8' && [[ $fipsMode == 'enabled' ]] ) && rlIsRHEL '<9'; then
             C_NAME[$i]="TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA"
             C_OPENSSL[$i]="ECDHE-RSA-DES-CBC3-SHA"
             C_ID[$i]="C012"
@@ -498,7 +496,7 @@ rlJournalStart
 
         # 3DES is not allowed in RHEL-8 in FIPS mode
         # or in RHEL-9
-        if ! (! rlIsRHEL '<8' && [[ $fips -eq 0 ]] ) && rlIsRHEL '<9'; then
+        if ! (! rlIsRHEL '<8' && [[ $fipsMode == 'enabled' ]] ) && rlIsRHEL '<9'; then
             C_NAME[$i]="TLS_ECDHE_ECDSA_WITH_3DES_EDE_CBC_SHA"
             C_OPENSSL[$i]="ECDHE-ECDSA-DES-CBC3-SHA"
             C_ID[$i]="C008"
@@ -579,7 +577,7 @@ rlJournalStart
 
         # TLS 1.1 is not supported on RHEL-8 in FIPS mode
         # or on RHEL-9
-        if (! rlIsRHEL '<8' && [[ $fips -eq 0 ]]) || ! rlIsRHEL '<9'; then
+        if (! rlIsRHEL '<8' && [[ $fipsMode == 'enabled' ]]) || ! rlIsRHEL '<9'; then
             protocols=(tls1_2)
         else
             protocols=(tls1_2 tls1_1)

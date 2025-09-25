@@ -4,7 +4,7 @@
 #
 #   runtest.sh of /CoreOS/openssl/Interoperability/tls-1-3-interoperability-gnutls-openssl-2way
 #   Description: Test TLS 1.3 interoperability between GnuTLS and OpenSSL
-#   Author: Hubert Kario <hkario@redhat.com>
+#   Author: Alicja Kario <hkario@redhat.com>
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
@@ -40,7 +40,7 @@ rlJournalStart
     rlPhaseStartSetup
         rlAssertRpm --all
 
-        rlRun "rlImport fips"
+        rlRun "rlImport distribution/fips"
         if ( ! rlIsRHEL '<9' ) && ( ! rlIsFedora); then
             TWAY="${TWAY}-9.0"
         fi
@@ -50,7 +50,7 @@ rlJournalStart
             TWAY_CSV=${TWAY}.fips.csv
         fi
 
-        rlRun "rlImport tls-1-3-interoperability-gnutls-openssl"
+        rlRun "rlImport openssl/tls-1-3-interoperability-gnutls-openssl"
         rlRun "TmpDir=\$(mktemp -d)" 0 "Creating tmp directory"
         TEST_DIR=$(pwd)
         rlRun "pushd $TmpDir"

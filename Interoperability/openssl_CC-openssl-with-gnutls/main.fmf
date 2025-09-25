@@ -1,12 +1,15 @@
 summary: Test CC relevant ciphers with openssl and gnutls
 description: |
     GnuTLS on RHEL-6 and earlier doesn't support ECC
-contact: Hubert  Kario <hkario@redhat.com>
+contact: Alicja Kario <hkario@redhat.com>
 component:
   - openssl
   - gnutls
 test: ./runtest.sh
 framework: beakerlib
+require:
+  - library(openssl/certgen)
+  - library(distribution/fips)
 recommend:
   - gnutls
   - openssl

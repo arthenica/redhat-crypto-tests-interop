@@ -40,6 +40,9 @@ rlJournalStart
         rlRun "TmpDir=\$(mktemp -d)" 0 "Creating tmp directory"
         rlRun "pushd $TmpDir"
 
+        # other tests remove softhsm =/
+        rlRun 'rpm -q softhsm || yum -y install softhsm'
+
     rlPhaseStartTest "Generate key and cert"
         cat >$SH_CONF <<_EOF
 directories.tokendir = ./db

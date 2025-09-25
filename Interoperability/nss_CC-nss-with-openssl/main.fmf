@@ -39,6 +39,9 @@ component:
   - nss-softokn
 test: ./runtest.sh
 framework: beakerlib
+require:
+  - library(openssl/certgen)
+  - library(distribution/fips)
 recommend:
   - net-tools
   - nss

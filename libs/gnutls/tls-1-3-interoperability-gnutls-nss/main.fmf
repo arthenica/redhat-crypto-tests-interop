@@ -1,6 +1,5 @@
 summary: Test TLS 1.3 interoperability between NSS and GnuTLS
-description: |
-    test case marked as manual as it may break beaker
+description: ''
 contact: Alexander Sosedkin <asosedki@redhat.com>
 component:
   - nss
@@ -10,15 +9,13 @@ framework: beakerlib
 require:
   - library(openssl/certgen)
   - library(distribution/fips)
-  - library(gnutls/tls-1-3-interoperability-gnutls-nss)
-recommend:
   - expect
   - gnutls
   - gnutls-utils
   - nss
   - nss-tools
   - openssl
-duration: 3h
+duration: 12h
 enabled: true
 tag:
   - NoRHEL4
@@ -26,19 +23,13 @@ tag:
   - NoRHEL6
   - NoRHEL7
   - TIPpass_Security
+  - Tier2
   - results-yesterday-stable
-  - tipx
-  - notip
-  - NoTier
-  - interop
-  - interop-gnutls
-  - interop-nss
-  - interop-3way
-  - interop-slow
+tier: '2'
 link:
   - relates: https://bugzilla.redhat.com/show_bug.cgi?id=1677754
   - relates: https://bugzilla.redhat.com/show_bug.cgi?id=1724250
-  - relates: https://bugzilla.redhat.com/show_bug.cgi?id=1731182
+  - relates: https://bugzilla.redhat.com/show_bug.cgi?id=1908334
 adjust:
   - because: gnutls and openssl don't support tls1.3 on rhel-7 and earlier
     enabled: false
@@ -48,7 +39,6 @@ adjust:
     enabled: false
     when: distro ~< rhel-8.3
     continue: false
-extra-nitrate: TC#0602530
-extra-summary: /CoreOS/gnutls/Interoperability/tls-1-3-interoperability-gnutls-nss-3way
-extra-task: /CoreOS/gnutls/Interoperability/tls-1-3-interoperability-gnutls-nss-3way
-id: e81e766a-3101-4691-8b6e-3b573358a64f
+extra-nitrate: TC#0602607
+extra-summary: /CoreOS/gnutls/Library/tls-1-3-interoperability-gnutls-nss
+extra-task: /CoreOS/gnutls/Library/tls-1-3-interoperability-gnutls-nss

@@ -40,8 +40,8 @@ CLIENT_UTIL="/usr/lib/nss/unsupported-tools/tstclnt"
 rlJournalStart
     rlPhaseStartSetup
         rlAssertRpm --all
-        rlRun "rlImport certgen"
-        rlRun "rlImport fips"
+        rlRun "rlImport openssl/certgen"
+        rlRun "rlImport distribution/fips"
         fipsIsEnabled
         fips=$?
         if [[ $fips -eq 2 ]]; then
