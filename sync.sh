@@ -33,7 +33,7 @@ TESTS=(
         "openssl/Library/certgen"
         "openssl/Library/tls-1-3-interoperability-gnutls-openssl"
         "openssl/Library/tls-1-3-interoperability-nss-openssl"
-        "gnutls/Library/tls-1-3-interoperability-gnutls-nss/"
+        "gnutls/Library/tls-1-3-interoperability-gnutls-nss"
         # tests: openssl <-> gnutls
         "openssl/Interoperability/tls-1-3-interoperability-gnutls-openssl-2way"
         "openssl/Interoperability/tls-1-3-interoperability-gnutls-openssl-3way"
@@ -48,7 +48,7 @@ TESTS=(
         "gnutls/Interoperability/tls-1-3-interoperability-gnutls-nss-2way"
         "gnutls/Interoperability/tls-1-3-interoperability-gnutls-nss-3way"
         "gnutls/Interoperability/TLSv1-2-with-NSS"
-	"gnutls/Interoperability/renegotiation-with-NSS"
+        "gnutls/Interoperability/renegotiation-with-NSS"
         # tests: nss <-> openssl (TODO)
         "openssl/Interoperability/tls-1-3-interoperability-nss-openssl-2way"
         "nss/Interoperability/renego-and-resumption-NSS-with-OpenSSL"
@@ -58,6 +58,7 @@ TESTS=(
 EXCLUDED_FILES=(
         # files to be excluded in rsync
         "expectedness.yml"
+        "Makefile"
 )
 
 repourl="https://gitlab.com/redhat-crypto/tests/interop.git"
@@ -69,21 +70,22 @@ for t in ${TESTS[@]}; do
 
     sdir="$source_root/$t"
     debug "Source dir: $sdir"
+    parent=${t%%/*}
+    debug "Parent repo: $parent"
+    testname=${t##*/}
+    debug "Test name: $testname"
     if [[ "$t" != *"/Library/"* ]]; then
-        parent=${t%%/*}
-        debug "Parent repo: $parent"
-        testname=${t##*/}
-        debug "Test name: $testname"
         ddir="$dest_root/Interoperability/${parent}_$testname"
-    else
+    else # library
         ddir="$dest_root/${t#*/}"
+        ddir="$dest_root/libs/$parent/$testname"
     fi
     debug "Dest dir: $ddir"
     mkdir -p $ddir
     debug "$sdir -> $ddir"
     EXCLUDE=""
     for i in ${EXCLUDED_FILES[@]}; do EXCLUDE="$EXCLUDE --exclude ${i}"; done;
-    rsync -a $EXCLUDE $sdir/ $ddir/ || fail "rsync"
+    rsync -a --delete $EXCLUDE $sdir/ $ddir/ || fail "rsync"
 
     if [[ -r $ddir/lib.sh ]]; then
         debug "Handling test library"
@@ -95,33 +97,12 @@ for t in ${TESTS[@]}; do
         fail "unknown dir type"
     fi
 
-    echo "Remapping:"
-    while read line; do
-        debug "read line: $line"
-        lib=$(echo $line |sed 's/^.*rlImport[ ]*\([^ "]*\).*$/\1/')
-        libc=${lib%/*}
-        libn=${lib#*/}
-        echo "  Libname: $lib = $libc / $libn"
-        sed -i "s|rlImport[ ]*$libc[ ]*/[ ]*$libn|rlImport $libn|g" $ddir/$scriptfile
-    done < <(cat $ddir/$scriptfile |grep '^[^#]*rlImport')
-
-    echo "  FMF medatada"
+    echo "  FMF metadata"
     if [[ ${t%%/*} != "distribution" && ! -r $source_root/$t/main.fmf ]]; then
         fail "$t: no FMF metadata"
     fi
-    if [[ -r $source_root/$t/main.fmf ]]; then
-        sed -i "/[ ]*-[ ]*library[ ]*([^)]*)/d" $ddir/main.fmf # remove libs from long lists
-        sed -i "s/library[ ]*([^)]*)[ ,]*//g" $ddir/main.fmf # remove libs from short lists
-
-        # ugly hack to remove empty "require"s
-        cat $ddir/main.fmf |awk '/^require:$/ { req=1; next } /^recommend:$/ { if (req) { req=0; print; next } } { if (req) { req=0; print "require:"; } print }' >$ddir/main.fmf.new
-        mv $ddir/main.fmf.new $ddir/main.fmf
-    fi
+    sed -i "s|library[ ]*([ ]*\([^ /]*\)[ ]*/[ ]*\([^ )]*\))|{'type': 'library', 'path': '/libs/\1', 'name': '/\2'}|g" $ddir/main.fmf
     if [[ $scriptfile = "runtest.sh" && -r $ddir/main.fmf ]]; then
         grep -qw interop $ddir/main.fmf || fail "no 'interop' tag"
-    fi
-    if [[ -r $ddir/Makefile ]]; then
-        echo "  Makefile"
-        sed -i "/RhtsRequires:/d" $ddir/Makefile
     fi
 done

@@ -1,4 +1,4 @@
-summary: Test TLS 1.3 interoperability between NSS and OpenSSL
+summary: Test TLS 1.3 interoperability between NSS and OpenSSL (shared code library)
 description: ''
 contact: Alexander Sosedkin <asosedki@redhat.com>
 component:
@@ -9,32 +9,24 @@ framework: beakerlib
 require:
   - {'type': 'library', 'path': '/libs/openssl', 'name': '/certgen'}
   - {'type': 'library', 'path': '/libs/distribution', 'name': '/fips'}
-  - {'type': 'library', 'path': '/libs/openssl', 'name': '/tls-1-3-interoperability-nss-openssl'}
-recommend:
   - expect
   - nss
   - nss-tools
   - openssl
-duration: 2h
+  - tcpdump
+duration: 15m
 enabled: true
 tag:
   - NoRHEL4
   - NoRHEL5
   - NoRHEL6
   - NoRHEL7
-  - Tier3
-  - interop
-  - interop-openssl
-  - interop-nss
-  - interop-2way
-  - interop-slow
-tier: '3'
+  - Tier2
+tier: '2'
 link:
-  - relates: https://bugzilla.redhat.com/show_bug.cgi?id=1935040
-  - relates: https://bugzilla.redhat.com/show_bug.cgi?id=1952615
-  - relates: https://bugzilla.redhat.com/show_bug.cgi?id=1731182
   - relates: https://bugzilla.redhat.com/show_bug.cgi?id=1724250
-  - relates: https://bugzilla.redhat.com/show_bug.cgi?id=1983676
+  - relates: https://bugzilla.redhat.com/show_bug.cgi?id=1731182
+  - relates: https://bugzilla.redhat.com/show_bug.cgi?id=1952615
 adjust:
   - because: OpenSSL doesn't support TLS 1.3 on RHEL-7 and earlier
     enabled: false
@@ -47,7 +39,6 @@ adjust:
     enabled: false
     when: distro ~<= rhel-8.1 and fips is defined
     continue: false
-extra-nitrate: TC#0602843
-extra-summary: /CoreOS/openssl/Interoperability/tls-1-3-interoperability-nss-openssl-2way
-extra-task: /CoreOS/openssl/Interoperability/tls-1-3-interoperability-nss-openssl-2way
-id: 03727e85-04a4-4e5e-9c19-c07174d500f5
+extra-nitrate: TC#0602841
+extra-summary: /CoreOS/openssl/Library/tls-1-3-interoperability-nss-openssl
+extra-task: /CoreOS/openssl/Library/tls-1-3-interoperability-nss-openssl

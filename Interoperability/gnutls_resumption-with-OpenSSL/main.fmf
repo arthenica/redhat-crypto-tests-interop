@@ -6,6 +6,8 @@ component:
   - gnutls
 test: ./runtest.sh
 framework: beakerlib
+require:
+  - {'type': 'library', 'path': '/libs/openssl', 'name': '/certgen'}
 recommend:
   - gnutls
   - gnutls-utils
