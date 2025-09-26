@@ -32,10 +32,13 @@
 PACKAGE="gnutls"
 PACKAGES="gnutls nss"
 
-CLNT="/usr/lib64/nss/unsupported-tools/tstclnt"
-[[ ! -x $CLNT ]] && CLNT="/usr/lib/nss/unsupported-tools/tstclnt"
-SERV="/usr/lib64/nss/unsupported-tools/selfserv"
-[[ ! -x $SERV ]] && SERV="/usr/lib/nss/unsupported-tools/selfserv"
+PATHS_UTIL=(
+    /usr/lib64/nss/unsupported-tools
+    /usr/lib/nss/unsupported-tools
+    )
+SERVER_UTIL=${SERVER_UTIL:-$(find ${PATHS_UTIL[@]} -name selfserv -print -quit)}
+CLIENT_UTIL=${CLIENT_UTIL:-$(find ${PATHS_UTIL[@]} -name tstclnt -print -quit)}
+STRSCLNT_UTIL=${STRSCLNT_UTIL:-$(find ${PATHS_UTIL[@]} -name strsclnt -print -quit)}
 
 rlJournalStart
     rlPhaseStartSetup
@@ -57,14 +60,14 @@ rlJournalStart
         rlRun "certutil -L -d sql:nssdb"
 
         # Since RHEL-8 we need LEGACY policy to test TLS 1.1
-        if ! rlIsRHEL "<8"; then
+        if rlIsRHEL && ! rlIsRHEL "<8"; then
             CRYPTO_POLICY=$(update-crypto-policies --show)
             rlRun "update-crypto-policies --set LEGACY"
         fi
     rlPhaseEnd
 
     rlPhaseStartTest "nss server"
-        rlRun "$SERV -d sql:nssdb -n $hostname -V ssl3:tls1.2 -p 4433 >server.log 2>server.err &"
+        rlRun "$SERVER_UTIL -d sql:nssdb -n $hostname -V ssl3:tls1.2 -p 4433 >server.log 2>server.err &"
         nss_pid=$!
         rlRun "rlWaitForSocket -p $nss_pid 4433"
         if ! rlIsRHEL '<=6.6'; then
@@ -100,7 +103,7 @@ rlJournalStart
             settings=("tls1.2")
         fi
         for sett in ${settings[@]}; do
-            rlRun -s "./nss-client.expect $CLNT -V ssl3:$sett -r 1 -d sql:nssdb -p 4433 -h $hostname"
+            rlRun -s "./nss-client.expect $CLIENT_UTIL -V ssl3:$sett -r 1 -d sql:nssdb -p 4433 -h $hostname"
             rlAssertGrep "HTTP/1.0 200 OK" $rlRun_LOG
             rlAssertGrep "$sett" $rlRun_LOG -i
         done
@@ -109,7 +112,7 @@ rlJournalStart
     rlPhaseEnd
 
     rlPhaseStartCleanup
-        if ! rlIsRHEL "<8"; then
+        if rlIsRHEL && ! rlIsRHEL "<8"; then
             rlRun "update-crypto-policies --set $CRYPTO_POLICY"
         fi
         rlRun "popd"

@@ -324,7 +324,7 @@ function fipsIsEnabled {
             ret_val=1;
         fi
 
-    elif [[ $(source /etc/os-release && echo $ID) = "ubuntu" ]]; then
+    elif rlIsOS "ubuntu"; then
 
             ret_val=1
 

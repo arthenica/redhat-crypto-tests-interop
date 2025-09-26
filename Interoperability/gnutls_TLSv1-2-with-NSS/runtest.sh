@@ -32,10 +32,12 @@
 PACKAGE="gnutls"
 PACKAGES="openssl gnutls nss"
 
-SERVER_UTIL="/usr/lib/nss/unsupported-tools/selfserv"
-CLIENT_UTIL="/usr/lib/nss/unsupported-tools/tstclnt"
-[ -f /usr/lib64/nss/unsupported-tools/selfserv ] && SERVER_UTIL="/usr/lib64/nss/unsupported-tools/selfserv"
-[ -f /usr/lib64/nss/unsupported-tools/tstclnt ] && CLIENT_UTIL="/usr/lib64/nss/unsupported-tools/tstclnt"
+PATHS_UTIL=(
+    /usr/lib64/nss/unsupported-tools
+    /usr/lib/nss/unsupported-tools
+    )
+SERVER_UTIL=${SERVER_UTIL:-$(find ${PATHS_UTIL[@]} -name selfserv -print -quit)}
+CLIENT_UTIL=${CLIENT_UTIL:-$(find ${PATHS_UTIL[@]} -name tstclnt -print -quit)}
 
 rlJournalStart
     rlPhaseStartSetup
@@ -51,7 +53,7 @@ rlJournalStart
         # policy on RHEL-8. If FIPS mode is set, we should not touch
         # policy though.
         GNUTLS_PRIO="NORMAL"
-        if ! rlIsRHEL '<8' && [ $_fips -ne 0 ]; then
+        if (rlIsRHELLike || rlIsFedora) && ! rlIsRHEL '<8' && [ $_fips -ne 0 ]; then
             rlRun "rlFileBackup /etc/crypto-policies/config"
             rlRun "echo LEGACY > /etc/crypto-policies/config"
             rlRun "update-crypto-policies"
@@ -673,7 +675,7 @@ rlJournalStart
     done
 
     rlPhaseStartCleanup
-        if ! rlIsRHEL '<8' && [ $_fips -ne 0 ]; then
+        if (rlIsRHELLike || rlIsFedora) && ! rlIsRHEL '<8' && [ $_fips -ne 0 ]; then
             rlRun "rlFileRestore"
             rlRun "update-crypto-policies"
         elif rlIsRHEL '7' && rlIsRHEL '>=7.7'; then

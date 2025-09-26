@@ -26,6 +26,7 @@ tag:
   - interop-reneg
   - interop-slow
   - very_slow
+  - interop-nss-broken
 adjust:
   - enabled: false
     when: distro == rhel-4, rhel-5
