@@ -581,7 +581,7 @@ rlJournalStart
             options+=(-cert ${C_CERT[$j]})
             options+=(-CAfile '<(cat $(x509Cert ca) ${C_SUBCA[$j]})')
             options+=(-cipher ${C_OPENSSL[$j]})
-            if rlIsRHELLike && ! rlIsRHEL '<9'; then
+            if rlIsFedora || (rlIsRHELLike && ! rlIsRHEL '<9'); then
                 options+=(-client_renegotiation)
             fi
             if [[ $(echo ${C_NAME[$j]}  | awk -F"_" '{print $2}') == "DHE" ]] && fipsIsEnabled; then
@@ -632,7 +632,7 @@ rlJournalStart
             options+=(-CAfile '<(cat $(x509Cert ca) ${C_SUBCA[$j]})')
             options+=(-cipher ${C_OPENSSL[$j]})
             options+=(-Verify 1 -verify_return_error)
-            if rlIsRHELLike && ! rlIsRHEL '<9'; then
+            if rlIsFedora || (rlIsRHELLike && ! rlIsRHEL '<9'); then
                 options+=(-client_renegotiation)
             fi
             if [[ $(echo ${C_NAME[$j]}  | awk -F"_" '{print $2}') == "DHE" ]] && fipsIsEnabled; then
