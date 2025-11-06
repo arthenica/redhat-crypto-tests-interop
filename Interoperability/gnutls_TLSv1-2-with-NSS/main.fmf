@@ -8,8 +8,8 @@ component:
 test: ./runtest.sh
 framework: beakerlib
 require:
-  - library(distribution/fips)
-  - library(openssl/certgen)
+  - {'type': 'library', 'path': '/libs/distribution', 'name': '/fips'}
+  - {'type': 'library', 'path': '/libs/openssl', 'name': '/certgen'}
 recommend:
   - expect
   - gnutls
