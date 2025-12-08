@@ -1,7 +1,6 @@
 # Butchered openssl.spec for compilation in fedora 39 container.
 
-# 3.0.0 soversion = 3 (same as upstream)
-%define soversion 3
+%define soversion 4
 
 # Arches on which we need to prevent arch conflicts on opensslconf.h, must
 # also be handled in opensslconf-new.h.
@@ -25,7 +24,7 @@ print(string.sub(hash, 0, 16))
 
 Summary: Utilities from the general purpose cryptography library with TLS implementation
 Name: openssl
-Version: 3.3.0
+Version: 4.0.0
 Release: dev
 Epoch: 1
 Source: openssl-%{version}.tar.gz
