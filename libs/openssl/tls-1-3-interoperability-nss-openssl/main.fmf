@@ -7,8 +7,8 @@ component:
 test: ./runtest.sh
 framework: beakerlib
 require:
-  - library(openssl/certgen)
-  - library(distribution/fips)
+  - {'type': 'library', 'path': '/libs/openssl', 'name': '/certgen'}
+  - {'type': 'library', 'path': '/libs/distribution', 'name': '/fips'}
   - expect
   - nss
   - nss-tools
