@@ -1,7 +1,6 @@
 # Butchered openssl.spec for compilation in fedora 39 container.
 
-# 3.0.0 soversion = 3 (same as upstream)
-%define soversion 3
+%define soversion SOVERSION
 
 # Arches on which we need to prevent arch conflicts on opensslconf.h, must
 # also be handled in opensslconf-new.h.
@@ -23,9 +22,14 @@ print(string.sub(hash, 0, 16))
 
 %global _performance_build 1
 
+# https://fedoraproject.org/wiki/Changes/OpensslDeprecateEngine
+# ENGINE is deprecated but still (separately) available for Fedora.
+# It has been completely removed from RHEL 10 and later.
+%bcond engine %[!(0%{?rhel} >= 10)]
+
 Summary: Utilities from the general purpose cryptography library with TLS implementation
 Name: openssl
-Version: 3.3.0
+Version: 4.0.0
 Release: dev
 Epoch: 1
 Source: openssl-%{version}.tar.gz
@@ -40,12 +44,13 @@ BuildRequires: /usr/bin/pod2man
 BuildRequires: /usr/sbin/sysctl
 BuildRequires: perl(Test::Harness), perl(Test::More), perl(Math::BigInt)
 BuildRequires: perl(Module::Load::Conditional), perl(File::Temp)
-BuildRequires: perl(Time::HiRes), perl(IPC::Cmd), perl(Pod::Html), perl(Digest::SHA)
+BuildRequires: perl(Time::HiRes), perl(Time::Piece), perl(IPC::Cmd), perl(Pod::Html), perl(Digest::SHA)
 BuildRequires: perl(FindBin), perl(lib), perl(File::Compare), perl(File::Copy), perl(bigint)
 BuildRequires: git-core
 BuildRequires: systemtap-sdt-devel
 Requires: coreutils
 Requires: %{name}-libs%{?_isa} = %{epoch}:%{version}-%{release}
+Obsoletes: oqsprovider < 0.9.0
 
 %description
 The OpenSSL toolkit provides support for secure communications between
@@ -57,7 +62,10 @@ protocols.
 Summary: A general purpose cryptography library with TLS implementation
 Requires: ca-certificates >= 2008-5
 Requires: crypto-policies >= 20180730
-Recommends: openssl-pkcs11%{?_isa}
+Recommends: pkcs11-provider%{?_isa}
+%if ( %{defined rhel} && (! %{defined centos}) && (! %{defined eln}) )
+Requires: openssl-fips-provider
+%endif
 
 %description libs
 OpenSSL is a toolkit for supporting cryptography. The openssl-libs
@@ -68,11 +76,28 @@ support cryptographic algorithms and protocols.
 Summary: Files for development of applications which will use OpenSSL
 Requires: %{name}-libs%{?_isa} = %{epoch}:%{version}-%{release}
 Requires: pkgconfig
+%if %{without engine}
+Obsoletes: %{name}-devel-engine < %{epoch}:%{version}-%{release}
+%endif
 
 %description devel
 OpenSSL is a toolkit for supporting cryptography. The openssl-devel
 package contains include files needed to develop applications which
 support various cryptographic algorithms and protocols.
+
+%if %{with engine}
+%package devel-engine
+Summary: Files for development of applications which will use OpenSSL and use deprecated ENGINE API.
+Requires: %{name}-libs%{?_isa} = %{epoch}:%{version}-%{release}
+Requires: %{name}-devel%{?_isa} = %{epoch}:%{version}-%{release}
+Requires: pkgconfig
+Provides: deprecated()
+
+%description devel-engine
+OpenSSL is a toolkit for supporting cryptography. The openssl-devel-engine
+package contains include files needed to develop applications which
+use deprecated OpenSSL ENGINE functionality.
+%endif
 
 %package perl
 Summary: Perl scripts provided with OpenSSL
@@ -145,7 +170,7 @@ sslarch="linux64-mips64 -mips64r2"
 sslflags=enable-ec_nistp_64_gcc_128
 %endif
 %ifarch riscv64
-sslarch=linux-generic64
+sslarch=linux64-riscv64
 %endif
 ktlsopt=enable-ktls
 %ifarch armv7hl
@@ -165,20 +190,23 @@ export HASHBANGPERL=/usr/bin/perl
 # Configure the build tree.  Override OpenSSL defaults with known-good defaults
 # usable on all platforms.  The Configure script already knows to use -fPIC and
 # RPM_OPT_FLAGS, so we can skip specifiying them here.
-#cd openssl-%{version}
 ./Configure \
 	--prefix=%{_prefix} --openssldir=%{_sysconfdir}/pki/tls ${sslflags} \
+%ifarch riscv64
+        --libdir=%{_lib} \
+%endif
 	zlib enable-camellia enable-seed enable-rfc3779 enable-sctp \
-	enable-cms enable-md2 enable-rc5 ${ktlsopt} enable-fips\
-	no-fuzz-afl no-fuzz-libfuzzer \
-	no-mdc2 no-ec2m no-sm2 no-sm4 no-buildtest-c++\
-	shared  ${sslarch} $RPM_OPT_FLAGS '-DDEVRANDOM="\"/dev/urandom\"" -DREDHAT_FIPS_VERSION="\"%{fips}\""'\
+	enable-cms enable-md2 enable-rc5 ${ktlsopt} enable-fips -D_GNU_SOURCE\
+	no-fuzz-afl no-fuzz-libfuzzer no-docs \
+	no-mdc2 no-ec2m no-sm2 no-sm4 no-atexit no-buildtest-c++\
+	shared  ${sslarch} $RPM_OPT_FLAGS '-DDEVRANDOM="\"/dev/urandom\""' -DOPENSSL_PEDANTIC_ZEROIZATION\
+	-DREDHAT_FIPS_VENDOR='"\"Red Hat Enterprise Linux OpenSSL FIPS Provider\""' -DREDHAT_FIPS_VERSION='"\"%{fips}\""'\
 	-Wl,--allow-multiple-definition
 
 # Do not run this in a production package the FIPS symbols must be patched-in
 #util/mkdef.pl crypto update
 
-make -s %{?_smp_mflags} build_sw
+make -s %{?_smp_mflags} build_inst_sw
 
 # Clean up the .pc files
 for i in libcrypto.pc libssl.pc openssl.pc ; do
@@ -186,9 +214,6 @@ for i in libcrypto.pc libssl.pc openssl.pc ; do
 done
 
 %check
-echo CHECK
-pwd
-#cd openssl-%{version}
 # Verify that what was compiled actually works.
 
 # Hack - either enable SCTP AUTH chunks in kernel or disable sctp for check
@@ -198,21 +223,19 @@ pwd
  touch -r configdata.pm configdata.pm.new && \
  mv -f configdata.pm.new configdata.pm)
 
-# We must revert patch4 before tests otherwise they will fail
-#patch -p1 -R < %{PATCH4}
-#We must disable default provider before tests otherwise they will fail
-#patch -p1 < %{SOURCE14}
 
 OPENSSL_ENABLE_MD5_VERIFY=
 export OPENSSL_ENABLE_MD5_VERIFY
-%if 0%{?rhel}
 OPENSSL_ENABLE_SHA1_SIGNATURES=
 export OPENSSL_ENABLE_SHA1_SIGNATURES
-%endif
 OPENSSL_SYSTEM_CIPHERS_OVERRIDE=xyz_nonexistent_file
 export OPENSSL_SYSTEM_CIPHERS_OVERRIDE
 #embed HMAC into fips provider for test run
-OPENSSL_CONF=/dev/null LD_LIBRARY_PATH=. apps/openssl dgst -binary -sha256 -mac HMAC -macopt hexkey:f4556650ac31d35461610bac4ed81b1a181b2d8a43ea2854cbae22ca74560813 < providers/fips.so > providers/fips.so.hmac
+#dd if=/dev/zero bs=1 count=32 of=tmp.mac
+#objcopy --update-section .rodata1=tmp.mac providers/fips.so providers/fips.so.zeromac
+#mv providers/fips.so.zeromac providers/fips.so
+#rm tmp.mac
+#LD_LIBRARY_PATH=. apps/openssl dgst -binary -sha256 -mac HMAC -macopt hexkey:f4556650ac31d35461610bac4ed81b1a181b2d8a43ea2854cbae22ca74560813 < providers/fips.so > providers/fips.so.hmac
 #objcopy --update-section .rodata1=providers/fips.so.hmac providers/fips.so providers/fips.so.mac
 #mv providers/fips.so.mac providers/fips.so
 echo "No tests for interop CI"
@@ -222,13 +245,8 @@ echo "No tests for interop CI"
 %install
 [ "$RPM_BUILD_ROOT" != "/" ] && rm -rf $RPM_BUILD_ROOT
 # Install OpenSSL.
-install -d $RPM_BUILD_ROOT{%{_bindir},%{_includedir},%{_libdir},%{_mandir},%{_libdir}/openssl,%{_pkgdocdir}}
-
-#cd openssl-%{version}
-%{__make} install_sw DESTDIR=%{?buildroot} INSTALL="%{__install} -p"
-%{__make} install_ssldirs DESTDIR=%{?buildroot} INSTALL="%{__install} -p"
-%{__make} install_fips DESTDIR=%{?buildroot} INSTALL="%{__install} -p"
-
+install -d $RPM_BUILD_ROOT{%{_bindir},%{_includedir},%{_libdir},%{_libdir}/openssl,%{_pkgdocdir}}
+%make_install
 rename so.%{soversion} so.%{version} $RPM_BUILD_ROOT%{_libdir}/*.so.%{soversion}
 for lib in $RPM_BUILD_ROOT%{_libdir}/*.so.%{version} ; do
 	chmod 755 ${lib}
@@ -241,9 +259,8 @@ for lib in $RPM_BUILD_ROOT%{_libdir}/*.a ; do
 	rm -f ${lib}
 done
 
-# Install a makefile for generating keys and self-signed certs, and a script
-# for generating them on the fly.
 mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/certs
+mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/openssl.d
 
 # Move runable perl scripts to bindir
 mv $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/misc/*.pl $RPM_BUILD_ROOT%{_bindir}
@@ -255,13 +272,15 @@ mkdir -m755 $RPM_BUILD_ROOT%{_sysconfdir}/pki/CA/certs
 mkdir -m755 $RPM_BUILD_ROOT%{_sysconfdir}/pki/CA/crl
 mkdir -m755 $RPM_BUILD_ROOT%{_sysconfdir}/pki/CA/newcerts
 
+# Ensure the config file timestamps are identical across builds to avoid
+# mulitlib conflicts and unnecessary renames on upgrade
+touch -r %{SOURCE0} $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/openssl.cnf
+touch -r %{SOURCE0} $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/ct_log_list.cnf
+
 rm -f $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/openssl.cnf.dist
 rm -f $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/ct_log_list.cnf.dist
 #we don't use native fipsmodule.cnf because FIPS module is loaded automatically
 rm -f $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/fipsmodule.cnf
-
-rm -f $RPM_BUILD_ROOT%{_libdir}/cmake/OpenSSL/OpenSSLConfig.cmake
-rm -f $RPM_BUILD_ROOT%{_libdir}/cmake/OpenSSL/OpenSSLConfigVersion.cmake
 
 # Determine which arch opensslconf.h is going to try to #include.
 basearch=%{_arch}
@@ -275,20 +294,13 @@ basearch=sparc
 basearch=sparc64
 %endif
 
-# Next step of gradual disablement of SSL3.
-# Make SSL3 disappear to newly built dependencies.
-sed -i '/^\#ifndef OPENSSL_NO_SSL_TRACE/i\
-#ifndef OPENSSL_NO_SSL3\
-# define OPENSSL_NO_SSL3\
-#endif' $RPM_BUILD_ROOT/%{_prefix}/include/openssl/opensslconf.h
+# Next step of gradual disablement of ENGINE.
+sed -i '/^\# ifndef OPENSSL_NO_STATIC_ENGINE/i\
+# if %{?with_engine:!__has_include(<openssl/engine.h>) &&} !defined(OPENSSL_NO_ENGINE)\
+#  define OPENSSL_NO_ENGINE\
+# endif' $RPM_BUILD_ROOT/%{_prefix}/include/openssl/configuration.h
 
-%ifarch %{multilib_arches}
-# Do an configuration.h switcheroo to avoid file conflicts on systems where you
-# can have both a 32- and 64-bit version of the library, and they each need
-# their own correct-but-different versions of opensslconf.h to be usable.
-cat $RPM_BUILD_ROOT/%{_prefix}/include/openssl/configuration.h >> \
-	$RPM_BUILD_ROOT/%{_prefix}/include/openssl/configuration-${basearch}.h
-%endif
+ln -s /etc/crypto-policies/back-ends/openssl_fips.config $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/fips_local.cnf
 
 %files
 %{!?_licensedir:%global license %%doc}
@@ -303,23 +315,32 @@ cat $RPM_BUILD_ROOT/%{_prefix}/include/openssl/configuration.h >> \
 %dir %{_sysconfdir}/pki/tls/certs
 %dir %{_sysconfdir}/pki/tls/misc
 %dir %{_sysconfdir}/pki/tls/private
+%dir %{_sysconfdir}/pki/tls/openssl.d
 %config(noreplace) %{_sysconfdir}/pki/tls/openssl.cnf
 %config(noreplace) %{_sysconfdir}/pki/tls/ct_log_list.cnf
+%config %{_sysconfdir}/pki/tls/fips_local.cnf
 %attr(0755,root,root) %{_libdir}/libcrypto.so.%{version}
 %{_libdir}/libcrypto.so.%{soversion}
 %attr(0755,root,root) %{_libdir}/libssl.so.%{version}
 %{_libdir}/libssl.so.%{soversion}
-%attr(0755,root,root) %{_libdir}/engines-%{soversion}
 %attr(0755,root,root) %{_libdir}/ossl-modules
 
 %files devel
 %doc CHANGES.md doc/dir-locals.example.el doc/openssl-c-indent.el
 %{_prefix}/include/openssl
+%exclude %{_prefix}/include/openssl/engine*.h
 %{_libdir}/*.so
 %{_libdir}/pkgconfig/*.pc
+%{_libdir}/cmake/OpenSSL/OpenSSLConfig.cmake
+%{_libdir}/cmake/OpenSSL/OpenSSLConfigVersion.cmake
+
+
+%if %{with engine}
+%files devel-engine
+%{_prefix}/include/openssl/engine*.h
+%endif
 
 %files perl
-%{_bindir}/c_rehash
 %{_bindir}/*.pl
 %{_bindir}/tsget
 %dir %{_sysconfdir}/pki/CA
