@@ -77,7 +77,6 @@ for t in ${TESTS[@]}; do
     if [[ "$t" != *"/Library/"* ]]; then
         ddir="$dest_root/Interoperability/${parent}_$testname"
     else # library
-        ddir="$dest_root/${t#*/}"
         ddir="$dest_root/libs/$parent/$testname"
     fi
     debug "Dest dir: $ddir"
@@ -98,10 +97,19 @@ for t in ${TESTS[@]}; do
     fi
 
     echo "  FMF metadata"
-    if [[ ${t%%/*} != "distribution" && ! -r $source_root/$t/main.fmf ]]; then
+    if [[ ! -r $source_root/$t/main.fmf ]]; then
         fail "$t: no FMF metadata"
     fi
-    #sed -i "s|library[ ]*([ ]*\([^ /]*\)[ ]*/[ ]*\([^ )]*\))|{'type': 'library', 'path': '/libs/\1', 'name': '/\2'}|g" $ddir/main.fmf
+
+    # remove library-requires from main.fmf
+    # ugly hack, needed because of https://github.com/teemtee/tmt/issues/522
+    sed -i "/[ ]*-[ ]*library[ ]*([^)]*)/d" $ddir/main.fmf # remove libs from long lists
+    sed -i "s/library[ ]*([^)]*)[ ,]*//g" $ddir/main.fmf # remove libs from short lists
+    # remove empty "require"s
+    cat $ddir/main.fmf |awk '/^require:$/ { req=1; next } /^recommend:$/ { if (req) { req=0; print; next } } { if (req) { req=0; print "require:"; } print }' >$ddir/main.fmf.new
+    mv $ddir/main.fmf.new $ddir/main.fmf
+
+
     if [[ $scriptfile = "runtest.sh" && -r $ddir/main.fmf ]]; then
         grep -qw interop $ddir/main.fmf || fail "no 'interop' tag"
     fi

@@ -43,9 +43,6 @@ component:
   - openssl
 test: ./runtest.sh
 framework: beakerlib
-require:
-  - library(openssl/certgen)
-  - library(distribution/fips)
 recommend:
   - nss
   - nss-tools

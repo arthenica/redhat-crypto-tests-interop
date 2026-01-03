@@ -7,9 +7,6 @@ component:
   - gnutls
 test: ./runtest.sh
 framework: beakerlib
-require:
-  - library(openssl/certgen)
-  - library(distribution/fips)
 recommend:
   - gnutls
   - openssl

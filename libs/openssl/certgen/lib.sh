@@ -3165,9 +3165,7 @@ for deciphering data when performing key agreement.
 
 =over
 
-=item *
-
-Alicja Kario <hkario@redhat.com>
+=item * Alicja Kario <hkario@redhat.com>
 
 =back
 
