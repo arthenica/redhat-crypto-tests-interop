@@ -63,7 +63,7 @@ rlJournalStart
             if [[ $fips -ne 0 ]]; then
                 current_policy=$(update-crypto-policies --show)
                 rlRun "update-crypto-policies --set LEGACY"
-                if ! rlIsRHELLike || rlIsRHEL '<10.1'; then
+                if ! (rlIsRHELLike || rlIsFedora) || rlIsRHEL '<10.1'; then
                     openssl_config=$(readlink /etc/crypto-policies/back-ends/openssl.config)
                     rlRun "rlFileBackup $openssl_config"
                     rlRun "sed -i 's/-CAMELLIA/CAMELLIA/g' $openssl_config"
