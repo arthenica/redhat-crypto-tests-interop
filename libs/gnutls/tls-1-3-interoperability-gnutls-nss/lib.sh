@@ -300,10 +300,12 @@ tls13interop_gnutls_nss_test() {
         else
             rlPhaseStartTest "GnuTLS server NSS client $c_name cipher $cert cert $c_sig sig_alg $g_name kex$g_type$sess_type$k_update"
         fi
-            [[ $DEBUG ]] && rlRun 'tcpdump -i lo -B 1024 -s 0 -U -w capture.pcap port 4433 &'
-            [[ $DEBUG ]] && tcpdump_pid=$!
-            [[ $DEBUG ]] && sleep 1.5 &
-            [[ $DEBUG ]] && sleep_pid=$!
+            if [[ $DEBUG ]]; then
+                rlRun 'tcpdump -i lo -B 1024 -s 0 -U -w capture.pcap port 4433 &'
+                tcpdump_pid=$!
+                sleep 1.5 &
+                sleep_pid=$!
+            fi
             options=(gnutls-serv)
             options+=(--http)
             options+=(-p 4433)
@@ -392,10 +394,12 @@ tls13interop_gnutls_nss_test() {
         rlRun "pk12util -i $(x509Key --pkcs12 --with-cert ${cert}-server) -d sql:./nssdb -W ''"
 
         rlLogInfo 'Test proper'
-        [[ $DEBUG ]] && rlRun 'tcpdump -i lo -B 1024 -s 0 -U -w capture.pcap port 4433 &'
-        [[ $DEBUG ]] && tcpdump_pid=$!
-        [[ $DEBUG ]] && sleep 1.5 &
-        [[ $DEBUG ]] && sleep_pid=$!
+        if [[ $DEBUG ]]; then
+            rlRun 'tcpdump -i lo -B 1024 -s 0 -U -w capture.pcap port 4433 &'
+            tcpdump_pid=$!
+            sleep 1.5 &
+            sleep_pid=$!
+        fi
         declare -a options=()
         options+=(${SERVER_UTIL} -d sql:./nssdb/ -p 4433
                   -c :${C_ID} -H 1 -v)
@@ -436,7 +440,7 @@ tls13interop_gnutls_nss_test() {
         fi
         if [[ $sess_type == ' resume' ]]; then
             # On RHEL 8.3, --waitresumption option was added to gnutls-cli (#1677754)
-            if ! rlIsRHEL || rlIsRHEL '<8.3'; then
+            if rlIsRHEL '<8.3'; then
                 options+=(--resume)
             else
                 options+=(--resume --waitresumption)
@@ -498,10 +502,12 @@ tls13interop_gnutls_nss_test() {
             rlRun 'certutil -L -d sql:./nssdb'
 
             rlLogInfo 'Test proper'
-            [[ $DEBUG ]] && rlRun 'tcpdump -i lo -B 1024 -s 0 -U -w capture.pcap port 4433 &'
-            [[ $DEBUG ]] && tcpdump_pid=$!
-            [[ $DEBUG ]] && sleep 1.5 &
-            [[ $DEBUG ]] && sleep_pid=$!
+            if [[ $DEBUG ]]; then
+                rlRun 'tcpdump -i lo -B 1024 -s 0 -U -w capture.pcap port 4433 &'
+                tcpdump_pid=$!
+                sleep 1.5 &
+                sleep_pid=$!
+            fi
             options=(--http -p 4433)
             options+=(--x509keyfile $(x509Key $cert-server))
             options+=(--x509certfile '<(cat $(x509Cert ${cert}-server) $(x509Cert ${cert}-ca))')
@@ -584,10 +590,12 @@ tls13interop_gnutls_nss_test() {
     else
         rlPhaseStartTest "NSS server GnuTLS client $c_name cipher $cert client cert $c_sig sig_alg $g_name kex$g_type$sess_type$k_update"
     fi
-        [[ $DEBUG ]] && rlRun 'tcpdump -i lo -B 1024 -s 0 -U -w capture.pcap port 4433 &'
-        [[ $DEBUG ]] && tcpdump_pid=$!
-        [[ $DEBUG ]] && sleep 1.5 &
-        [[ $DEBUG ]] && sleep_pid=$!
+        if [[ $DEBUG ]]; then
+            rlRun 'tcpdump -i lo -B 1024 -s 0 -U -w capture.pcap port 4433 &'
+            tcpdump_pid=$!
+            sleep 1.5 &
+            sleep_pid=$!
+        fi
         rlLogInfo 'Preparing NSS database'
         rlRun 'mkdir nssdb/'
         rlRun 'certutil -N --empty-password -d sql:./nssdb/'
@@ -638,7 +646,7 @@ tls13interop_gnutls_nss_test() {
         fi
         if [[ $sess_type == ' resume' ]]; then
             # On RHEL 8.3, --waitresumption option was added to gnutls-cli (#1677754)
-            if ! rlIsRHEL || rlIsRHEL '<8.3'; then
+            if rlIsRHEL '<8.3'; then
                 options+=(--resume)
             else
                 options+=(--resume --waitresumption)

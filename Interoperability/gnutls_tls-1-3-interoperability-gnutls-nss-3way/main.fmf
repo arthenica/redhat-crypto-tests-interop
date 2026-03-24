@@ -14,7 +14,7 @@ recommend:
   - nss
   - nss-tools
   - openssl
-duration: 3h
+duration: 5h
 enabled: true
 tag:
   - NoRHEL4

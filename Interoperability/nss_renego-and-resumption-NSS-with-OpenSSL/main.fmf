@@ -50,5 +50,7 @@ recommend:
   - expect
 duration: 6h
 extra-nitrate: TC#0521774
-extra-summary: /CoreOS/nss/Interoperability/renego-and-resumption-NSS-with-OpenSSL
+extra-summary: 
+    /CoreOS/nss/Interoperability/renego-and-resumption-NSS-with-OpenSSL
 extra-task: /CoreOS/nss/Interoperability/renego-and-resumption-NSS-with-OpenSSL
+id: cc0c4b41-8047-4bb1-ac4f-0c355f014e20
